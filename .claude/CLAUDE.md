@@ -29,7 +29,5 @@ Deliverable: `draft/aei_memo/aei_memo.pdf`.
 - `code/xarchive/`: the full earlier pipeline — Google Trends collection
   (SVG-decode approach, see notes/google_trends_pull_notes.txt), the search
   event study, national series figures, and the four-release AEI extraction.
-- `draft/full_paper_draft_jul2026/`: frozen full paper with the Google-search
-  benchmark (search interest ~15x in the primary week).
-- Raw Google Trends pulls remain in `original_data/google_trends/` (immutable);
-  derived Trends data are in `modified_data/_archive/`.
+- Raw Google Trends pulls remain in `original_data/_archive/google_trends/`
+  (immutable); derived Trends data are in `modified_data/_archive/`.

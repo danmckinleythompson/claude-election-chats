@@ -34,3 +34,6 @@ __pycache__/*
 !original_data/primary_dates/**
 !modified_data/aei_election_topics.csv
 !modified_data/aei_did_data.csv
+
+# Out-of-date full paper draft stays local only
+draft/full_paper_draft_jul2026/

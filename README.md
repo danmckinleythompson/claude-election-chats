@@ -31,5 +31,4 @@ can also be reproduced without the big download by running only the three
 `make_*` scripts. R dependencies: pacman, tidyverse, fixest, glue.
 
 `code/xarchive/` holds an archived earlier pipeline that benchmarked the result
-against a Google Trends event study around the same primaries; the frozen full
-paper draft is in `draft/full_paper_draft_jul2026/`.
+against a Google Trends event study around the same primaries.

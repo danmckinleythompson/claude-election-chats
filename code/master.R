@@ -1,7 +1,7 @@
 # Master script: runs the full pipeline in order
 # Project: do Claude conversations shift toward politics when a state holds
 # its primary? Diff-in-diff on the AEI Apr/May 2026 state-month topic shares.
-# The Google Trends comparison and full paper pipeline are archived in
+# The earlier Google Trends comparison pipeline is archived in
 # code/xarchive/ (see xarchive/master_full_pipeline.R).
 root = "~/Dropbox/AIElectionResearch"
 
