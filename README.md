@@ -1,4 +1,4 @@
-# claude-election-info
+# claude-election-chats
 
 Do Claude conversations shift toward politics when a state holds its primary?
 A difference-in-differences on the Anthropic Economic Index's public state-month
