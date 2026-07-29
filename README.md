@@ -19,9 +19,16 @@ percent. Write-up: `draft/aei_memo/aei_memo.pdf`.
 3. `make_aei_did_table.R` - estimate the three specifications, write the table
 4. `make_aei_politics_did.R` / `make_aei_change_hist.R` - the two figures
 
-Data are not tracked in git. Raw inputs go in `original_data/` (the AEI release
-CSV and `primary_dates/primary_dates_2026.csv`); the cleaning scripts rebuild
-everything in `modified_data/` from there.
+## Running it
+
+The repo runs out of the box: `Rscript code/master.R` reproduces everything.
+The cleaning script downloads the AEI release CSV (~210MB, too large for
+GitHub) from Hugging Face on first run. The hand-compiled primary calendar
+(`original_data/primary_dates/`, sources documented in its readme) and the two
+derived analysis files (`modified_data/aei_election_topics.csv`,
+`modified_data/aei_did_data.csv`) ship with the repo, so the table and figures
+can also be reproduced without the big download by running only the three
+`make_*` scripts. R dependencies: pacman, tidyverse, fixest, glue.
 
 `code/xarchive/` holds an archived earlier pipeline that benchmarked the result
 against a Google Trends event study around the same primaries; the frozen full

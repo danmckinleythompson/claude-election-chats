@@ -16,6 +16,17 @@ root = "~/Dropbox/AIElectionResearch"
 # extraction used for descriptive national series is archived in
 # code/xarchive/clean_aei_election_topics_all_releases.R.
 
+# Download the release from Hugging Face if it is not already on disk (~210MB,
+# too large for GitHub, so the repo fetches it on first run)
+aei_file = file.path(root, "original_data/anthropic_economic_index/release_2026_06_26/aei_claude_ai_2026-06-26.csv")
+if (!file.exists(aei_file)) {
+  dir.create(dirname(aei_file), recursive = TRUE, showWarnings = FALSE)
+  options(timeout = max(1200, getOption("timeout")))
+  download.file(
+    "https://huggingface.co/datasets/Anthropic/EconomicIndex/resolve/main/release_2026_06_26/data/aei_claude_ai_2026-06-26.csv",
+    aei_file, mode = "wb")
+}
+
 # The two topics we track: "Politics and public record" is the broadest
 # political category (hierarchy level 1); "Elections" is its narrow detailed
 # subtopic (level 0), published for too few states to use as an outcome
@@ -25,9 +36,7 @@ concept_lookup = tribble(
   "politics_broad",   "Politics and public record",  1
 )
 
-aei_topics = read_csv(
-  file.path(root, "original_data/anthropic_economic_index/release_2026_06_26/aei_claude_ai_2026-06-26.csv"),
-  show_col_types = FALSE) |>
+aei_topics = read_csv(aei_file, show_col_types = FALSE) |>
   filter(category_name == "request", metric_id == "pct") |>
   filter(geo_id == "USA" | str_starts(geo_id, "US-")) |>
   mutate(

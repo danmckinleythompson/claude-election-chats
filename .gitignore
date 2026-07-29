@@ -27,3 +27,10 @@ __pycache__/*
 .DS_Store
 .claude/settings.local.json
 .playwright-mcp/
+
+# Exceptions: small data shipped so a fresh clone runs out of the box
+# (the ~210MB AEI release itself is auto-downloaded by the cleaning script)
+!original_data/primary_dates/
+!original_data/primary_dates/**
+!modified_data/aei_election_topics.csv
+!modified_data/aei_did_data.csv

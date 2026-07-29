@@ -1,0 +1,87 @@
+release,date_start,date_end,geo_level,state_po,cluster_name,cluster_level,pct,concept
+apr2026,2026-04-01,2026-05-01,national,NA,Elections,0,0.04,elections_narrow
+apr2026,2026-04-01,2026-05-01,state,CA,Elections,0,0.05,elections_narrow
+apr2026,2026-04-01,2026-05-01,state,NY,Elections,0,0.03,elections_narrow
+apr2026,2026-04-01,2026-05-01,state,TX,Elections,0,0.03,elections_narrow
+apr2026,2026-04-01,2026-05-01,national,NA,Politics and public record,1,0.42,politics_broad
+apr2026,2026-04-01,2026-05-01,state,AL,Politics and public record,1,0.48,politics_broad
+apr2026,2026-04-01,2026-05-01,state,AR,Politics and public record,1,0.63,politics_broad
+apr2026,2026-04-01,2026-05-01,state,AZ,Politics and public record,1,0.42,politics_broad
+apr2026,2026-04-01,2026-05-01,state,CA,Politics and public record,1,0.41,politics_broad
+apr2026,2026-04-01,2026-05-01,state,CO,Politics and public record,1,0.43,politics_broad
+apr2026,2026-04-01,2026-05-01,state,CT,Politics and public record,1,0.4,politics_broad
+apr2026,2026-04-01,2026-05-01,state,DC,Politics and public record,1,1.05,politics_broad
+apr2026,2026-04-01,2026-05-01,state,FL,Politics and public record,1,0.36,politics_broad
+apr2026,2026-04-01,2026-05-01,state,GA,Politics and public record,1,0.33,politics_broad
+apr2026,2026-04-01,2026-05-01,state,ID,Politics and public record,1,0.59,politics_broad
+apr2026,2026-04-01,2026-05-01,state,IL,Politics and public record,1,0.43,politics_broad
+apr2026,2026-04-01,2026-05-01,state,IN,Politics and public record,1,0.33,politics_broad
+apr2026,2026-04-01,2026-05-01,state,KS,Politics and public record,1,0.71,politics_broad
+apr2026,2026-04-01,2026-05-01,state,KY,Politics and public record,1,0.54,politics_broad
+apr2026,2026-04-01,2026-05-01,state,LA,Politics and public record,1,0.39,politics_broad
+apr2026,2026-04-01,2026-05-01,state,MA,Politics and public record,1,0.45,politics_broad
+apr2026,2026-04-01,2026-05-01,state,MD,Politics and public record,1,0.53,politics_broad
+apr2026,2026-04-01,2026-05-01,state,MI,Politics and public record,1,0.46,politics_broad
+apr2026,2026-04-01,2026-05-01,state,MN,Politics and public record,1,0.46,politics_broad
+apr2026,2026-04-01,2026-05-01,state,MO,Politics and public record,1,0.39,politics_broad
+apr2026,2026-04-01,2026-05-01,state,NC,Politics and public record,1,0.37,politics_broad
+apr2026,2026-04-01,2026-05-01,state,NE,Politics and public record,1,0.67,politics_broad
+apr2026,2026-04-01,2026-05-01,state,NJ,Politics and public record,1,0.35,politics_broad
+apr2026,2026-04-01,2026-05-01,state,NV,Politics and public record,1,0.37,politics_broad
+apr2026,2026-04-01,2026-05-01,state,NY,Politics and public record,1,0.49,politics_broad
+apr2026,2026-04-01,2026-05-01,state,OH,Politics and public record,1,0.38,politics_broad
+apr2026,2026-04-01,2026-05-01,state,OK,Politics and public record,1,0.38,politics_broad
+apr2026,2026-04-01,2026-05-01,state,OR,Politics and public record,1,0.34,politics_broad
+apr2026,2026-04-01,2026-05-01,state,PA,Politics and public record,1,0.37,politics_broad
+apr2026,2026-04-01,2026-05-01,state,SC,Politics and public record,1,0.64,politics_broad
+apr2026,2026-04-01,2026-05-01,state,TN,Politics and public record,1,0.38,politics_broad
+apr2026,2026-04-01,2026-05-01,state,TX,Politics and public record,1,0.38,politics_broad
+apr2026,2026-04-01,2026-05-01,state,UT,Politics and public record,1,0.53,politics_broad
+apr2026,2026-04-01,2026-05-01,state,VA,Politics and public record,1,0.51,politics_broad
+apr2026,2026-04-01,2026-05-01,state,WA,Politics and public record,1,0.35,politics_broad
+apr2026,2026-04-01,2026-05-01,state,WI,Politics and public record,1,0.41,politics_broad
+may2026,2026-05-01,2026-06-01,national,NA,Elections,0,0.07,elections_narrow
+may2026,2026-05-01,2026-06-01,state,CA,Elections,0,0.14,elections_narrow
+may2026,2026-05-01,2026-06-01,state,FL,Elections,0,0.04,elections_narrow
+may2026,2026-05-01,2026-06-01,state,GA,Elections,0,0.16,elections_narrow
+may2026,2026-05-01,2026-06-01,state,NY,Elections,0,0.05,elections_narrow
+may2026,2026-05-01,2026-06-01,state,OR,Elections,0,0.14,elections_narrow
+may2026,2026-05-01,2026-06-01,state,PA,Elections,0,0.1,elections_narrow
+may2026,2026-05-01,2026-06-01,state,TX,Elections,0,0.06,elections_narrow
+may2026,2026-05-01,2026-06-01,state,WA,Elections,0,0.05,elections_narrow
+may2026,2026-05-01,2026-06-01,national,NA,Politics and public record,1,0.46,politics_broad
+may2026,2026-05-01,2026-06-01,state,AL,Politics and public record,1,0.57,politics_broad
+may2026,2026-05-01,2026-06-01,state,AZ,Politics and public record,1,0.35,politics_broad
+may2026,2026-05-01,2026-06-01,state,CA,Politics and public record,1,0.5,politics_broad
+may2026,2026-05-01,2026-06-01,state,CO,Politics and public record,1,0.42,politics_broad
+may2026,2026-05-01,2026-06-01,state,CT,Politics and public record,1,0.46,politics_broad
+may2026,2026-05-01,2026-06-01,state,DC,Politics and public record,1,1.01,politics_broad
+may2026,2026-05-01,2026-06-01,state,FL,Politics and public record,1,0.42,politics_broad
+may2026,2026-05-01,2026-06-01,state,GA,Politics and public record,1,0.54,politics_broad
+may2026,2026-05-01,2026-06-01,state,ID,Politics and public record,1,0.5,politics_broad
+may2026,2026-05-01,2026-06-01,state,IL,Politics and public record,1,0.45,politics_broad
+may2026,2026-05-01,2026-06-01,state,IN,Politics and public record,1,0.44,politics_broad
+may2026,2026-05-01,2026-06-01,state,KS,Politics and public record,1,0.6,politics_broad
+may2026,2026-05-01,2026-06-01,state,LA,Politics and public record,1,0.53,politics_broad
+may2026,2026-05-01,2026-06-01,state,MA,Politics and public record,1,0.44,politics_broad
+may2026,2026-05-01,2026-06-01,state,MD,Politics and public record,1,0.6,politics_broad
+may2026,2026-05-01,2026-06-01,state,MI,Politics and public record,1,0.36,politics_broad
+may2026,2026-05-01,2026-06-01,state,MN,Politics and public record,1,0.54,politics_broad
+may2026,2026-05-01,2026-06-01,state,MO,Politics and public record,1,0.45,politics_broad
+may2026,2026-05-01,2026-06-01,state,NC,Politics and public record,1,0.39,politics_broad
+may2026,2026-05-01,2026-06-01,state,NH,Politics and public record,1,0.5,politics_broad
+may2026,2026-05-01,2026-06-01,state,NJ,Politics and public record,1,0.34,politics_broad
+may2026,2026-05-01,2026-06-01,state,NM,Politics and public record,1,0.77,politics_broad
+may2026,2026-05-01,2026-06-01,state,NV,Politics and public record,1,0.45,politics_broad
+may2026,2026-05-01,2026-06-01,state,NY,Politics and public record,1,0.49,politics_broad
+may2026,2026-05-01,2026-06-01,state,OH,Politics and public record,1,0.43,politics_broad
+may2026,2026-05-01,2026-06-01,state,OK,Politics and public record,1,0.46,politics_broad
+may2026,2026-05-01,2026-06-01,state,OR,Politics and public record,1,0.57,politics_broad
+may2026,2026-05-01,2026-06-01,state,PA,Politics and public record,1,0.46,politics_broad
+may2026,2026-05-01,2026-06-01,state,SC,Politics and public record,1,0.38,politics_broad
+may2026,2026-05-01,2026-06-01,state,TN,Politics and public record,1,0.55,politics_broad
+may2026,2026-05-01,2026-06-01,state,TX,Politics and public record,1,0.43,politics_broad
+may2026,2026-05-01,2026-06-01,state,UT,Politics and public record,1,0.41,politics_broad
+may2026,2026-05-01,2026-06-01,state,VA,Politics and public record,1,0.49,politics_broad
+may2026,2026-05-01,2026-06-01,state,WA,Politics and public record,1,0.4,politics_broad
+may2026,2026-05-01,2026-06-01,state,WI,Politics and public record,1,0.36,politics_broad
