@@ -37,3 +37,10 @@ __pycache__/*
 
 # Out-of-date full paper draft stays local only
 draft/full_paper_draft_jul2026/
+
+# Ship the small Google Trends pulls and derived search panel too
+!original_data/google_trends/
+!original_data/google_trends/**
+original_data/google_trends/*.json
+!modified_data/google_trends_weekly.csv
+!modified_data/search_did_data.csv

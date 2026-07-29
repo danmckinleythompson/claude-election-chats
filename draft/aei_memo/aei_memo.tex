@@ -41,6 +41,14 @@ Table~\ref{tab:aei_did} reports the estimates. The primary raises the politics-t
 
 One corroborating pattern: the AEI's narrow ``Elections'' subtopic is published only where conversation counts clear the privacy floor. It appears in three states in April but eight in May, and the newly published states are disproportionately May-primary states (Oregon, Pennsylvania, Georgia)---election conversations became common enough to publish exactly where and when primaries occurred.
 
+\section*{The Same Shift Appears in Google Searches, About Twice as Large}
+
+How does the conversation response compare to the standard measure of public demand for election information? We assemble weekly Google search interest in ``primary election'' for all fifty states and the District of Columbia from July 2025 through the end of the AEI window, aggregated to calendar months.\footnote{Search interest measures the term's share of all searches in a state-week, indexed 0--100. Because scripted access to Google Trends is blocked, the series were read off the site's rendered charts in a browser and validated exactly against the one batch the site's own export produced; \texttt{original\_data/google\_trends/readme.txt} documents the collection. Trends normalizes each five-state collection batch to its own maximum, a state-specific scaling absorbed by the state fixed effects under logs.} Like the conversation outcome, the index is a share of activity rather than a volume, and the estimating equation, sample, months, and treatment coding are identical to those behind Table~\ref{tab:aei_did}; outcomes are in logs so the two responses compare as proportional effects.
+
+Searches respond about twice as strongly. Table~\ref{tab:search_did} reports the comparison: the primary month raises log search interest by 0.49 (s.e.\ 0.17) in the same 30 states where it raises the log politics-conversation share by 0.24 (s.e.\ 0.09), and the search estimate is nearly unchanged using all 46 non-March-primary jurisdictions. Figure~\ref{fig:search}a shows the search analogue of Figure~\ref{fig:did}a: the two groups track each other for nine months---including common surges at the November 2025 elections and the first primaries in March, national news that the month fixed effects absorb---then separate sharply inside the AEI window.
+
+The longer search panel also supports the identification checks the two-month Claude panel cannot (Figure~\ref{fig:search}b). Leads from July 2025 through February 2026, measured against March, are jointly indistinguishable from zero ($p = 0.10$)---the parallel-trends assumption holds where it can be tested. But treated states' searches are already 0.63 log points above control trends in April, as early voting and campaigning begin, and the May-versus-March contrast (1.12 log points) is roughly double the May-versus-April one. April, in other words, is a partially treated baseline, and control states are themselves lifted in May by national coverage of the big primary days. Both forces push the difference-in-differences toward zero in either dataset, so if conversations anticipate elections the way searches do, the estimates in Table~\ref{tab:aei_did} are best read as lower bounds on the total effect of an election.
+
 \begin{figure}[p]
 \centering
 \begin{subfigure}{0.85\textwidth}
@@ -57,8 +65,24 @@ One corroborating pattern: the AEI's narrow ``Elections'' subtopic is published 
 
 \input{../../output/aei_did_table.tex}
 
+\begin{figure}[p]
+\centering
+\begin{subfigure}{0.85\textwidth}
+\includegraphics[width=\textwidth]{search_did_plot.pdf}
+\caption{Monthly group means}
+\end{subfigure}
+\begin{subfigure}{0.85\textwidth}
+\includegraphics[width=\textwidth]{search_event_study.pdf}
+\caption{Event-study estimates, reference month April 2026}
+\end{subfigure}
+\caption{\textbf{Google searches for ``primary election'' replicate the design and reveal anticipation.} Panel (a) plots mean log search interest by month for the same May-primary and later-primary state groups as Figure~\ref{fig:did}; the shaded band is the AEI April--May window. Panel (b) plots coefficients on May-primary-state indicators by month, with state and month fixed effects, relative to April 2026; whiskers are 95 percent confidence intervals clustered by state. The uniformly negative leads mean the treated-control gap in April is already elevated relative to every earlier month.}
+\label{fig:search}
+\end{figure}
+
+\input{../../output/search_did_table.tex}
+
 \section*{What These Estimates Can and Cannot Tell Us}
 
-Four limitations to keep in mind. First, the panel is two months long, so the design is a single pre/post contrast across primary cohorts; we cannot examine pre-trends the way a longer panel would allow. Second, the privacy threshold limits the sample to 30 larger states and rules out the narrow ``Elections'' topic as an outcome; the ``Politics and public record'' topic includes political conversation beyond election logistics. Third, values are published rounded to two decimals, which adds noise that is meaningful relative to a 0.10-point effect. Fourth, the estimates describe the volume of politics-related conversations, not their content or accuracy.
+Four limitations to keep in mind. First, the AEI panel is two months long, so the Claude design is a single pre/post contrast across primary cohorts; the parallel-trends and anticipation checks come from the search panel rather than from the Claude data themselves. Second, the privacy threshold limits the sample to 30 larger states and rules out the narrow ``Elections'' topic as an outcome; the ``Politics and public record'' topic includes political conversation beyond election logistics. Third, values are published rounded to two decimals, which adds noise that is meaningful relative to a 0.10-point effect. Fourth, the estimates describe the volume of politics-related conversations, not their content or accuracy.
 
 \end{document}
