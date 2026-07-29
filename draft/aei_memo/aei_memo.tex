@@ -13,8 +13,7 @@
 
 \graphicspath{{../../output/}}
 
-\title{Do People Ask Claude About Upcoming Elections?\\
-\large Memo: a diff-in-differences in the Anthropic Economic Index}
+\title{How Much Are People Using Claude for Election Information?}
 \author{Daniel M. Thompson}
 \date{\today}
 
@@ -24,7 +23,7 @@
 
 \onehalfspacing
 
-\section*{What we are doing}
+\section*{Estimating the Effect of Primary Elections on the Rate of Political Claude Conversations}
 
 We want to know whether people use AI assistants to research upcoming elections. Individual AI conversations are private and usage data are proprietary, but the Anthropic Economic Index (AEI) now publishes anonymized, aggregated Claude usage at a useful resolution: the share of each U.S. state's conversations assigned to each topic in a hierarchy, by calendar month, for April and May 2026.\footnote{Released CC-BY at \url{https://huggingface.co/datasets/Anthropic/EconomicIndex}, \texttt{release\_2026\_06\_26}. Cells with too few conversations to protect privacy are not published, and topic taxonomies are re-estimated in each release, so we use only this release.} Our outcome is the share of a state's conversations in the ``Politics and public record'' topic, the broadest political category, published in both months for 33 states.
 
@@ -34,7 +33,7 @@ y_{sm} = \delta \left(\text{May primary}_s \times \text{May}_m\right) + \alpha_s
 \end{equation}
 where $y_{sm}$ is the politics-topic share in state $s$ and month $m \in \{\text{April}, \text{May}\}$, with state and month fixed effects and standard errors clustered by state. The identifying assumption is that, absent a primary, May-primary states' conversation topics would have moved like later-primary states'.
 
-\section*{What we find}
+\section*{Claude Conversations Shift Toward Politics When a State Holds Its Primary}
 
 Holding a primary shifts a state's Claude conversations toward politics. In April, before any of them voted, the eight May-primary states devoted 0.40 percent of conversations to the politics topic; in May, their primary month, 0.50 percent. The 22 later-primary states sat at 0.48 percent in both months (Figure~\ref{fig:did}a). The shift is broad-based rather than driven by an outlier: seven of the eight treated states move up, with a median change of $+$0.10 percentage points, while control-state changes straddle zero (Figure~\ref{fig:did}b).
 
@@ -58,8 +57,12 @@ One corroborating pattern: the AEI's narrow ``Elections'' subtopic is published 
 
 \input{../../output/aei_did_table.tex}
 
-\section*{Caveats}
+\section*{What These Estimates Can and Cannot Tell Us}
 
 Four limitations to keep in mind. First, the panel is two months long, so the design is a single pre/post contrast across primary cohorts; we cannot examine pre-trends the way a longer panel would allow. Second, the privacy threshold limits the sample to 30 larger states and rules out the narrow ``Elections'' topic as an outcome; the ``Politics and public record'' topic includes political conversation beyond election logistics. Third, values are published rounded to two decimals, which adds noise that is meaningful relative to a 0.10-point effect. Fourth, the estimates describe the volume of politics-related conversations, not their content or accuracy. A fuller draft with a Google-search benchmark (searches for ``primary election'' spike roughly fifteen-fold in the primary week) is in \texttt{draft/full\_paper\_draft\_jul2026/}.
+
+\section*{Acknowledgments}
+
+Claude Fable 5 (Anthropic) wrote the analysis code and most of this memo. I reviewed the code and text after the fact and checked them for accuracy.
 
 \end{document}
