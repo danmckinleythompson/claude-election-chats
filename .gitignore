@@ -1,0 +1,29 @@
+# Data directories wholesale - data lives in Dropbox, never in git
+original_data/*
+modified_data/*
+notes/*
+
+# Data formats, belt and suspenders
+*.csv
+*.dta
+*.RData
+*.rds
+*.parquet
+*.shp
+*.dbf
+*.json
+
+# LaTeX and editor detritus
+*.log
+*.aux
+*.bbl
+*.blg
+*.out
+*.synctex.gz
+__pycache__/*
+.vscode/*
+.Rproj.user/*
+.Rhistory
+.DS_Store
+.claude/settings.local.json
+.playwright-mcp/

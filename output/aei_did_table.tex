@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\caption{\textbf{Claude Conversations Shift Toward Politics When a State Holds Its Primary.}\label{tab:aei_did}}
+\begin{tabular}{lccc}
+\toprule \toprule
+ & \multicolumn{2}{c}{Politics-Topic Share (\%)} & Log Share \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-4}
+ & (1) & (2) & (3) \\
+\midrule
+Primary $\times$ May & 0.10 & 0.09 & 0.24 \\
+ & (0.04) & (0.04) & (0.09) \\[2mm]
+\# States & 30 & 20 & 30 \\
+\# Treated States & 8 & 8 & 8 \\
+\# Observations & 60 & 40 & 60 \\
+Control May Mean & 0.48 & 0.45 & 0.48 \\
+Minimum Detectable Effect & 0.11 & 0.12 & 0.24 \\
+\midrule
+State Fixed Effects & Yes & Yes & Yes \\
+Month Fixed Effects & Yes & Yes & Yes \\
+Excl.\ June-Primary Controls & No & Yes & No \\
+\bottomrule \bottomrule
+\multicolumn{4}{p{0.95\textwidth}}{\footnotesize \textit{Notes}: Each column reports a difference-in-differences estimate comparing the politics-topic share of Claude conversations in April and May 2026 between states holding a statewide primary in May 2026 and states with later primaries. The outcome in columns 1 and 2 is the percent of a state's conversations assigned to the ``Politics and public record'' topic in the Anthropic Economic Index; column 3 uses its natural log. Texas, North Carolina, and Illinois, which held March primaries, are excluded. Column 2 further drops control states with June primaries, whose mail voting begins in May. Standard errors clustered by state are in parentheses. The minimum detectable effect is 2.80 times the standard error.} \\
+\end{tabular}
+\end{table}
