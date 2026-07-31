@@ -30,6 +30,9 @@ two-month AEI window cannot.
 6. `make_search_did_table.R` / `make_search_did_plot.R` /
    `make_search_event_study.R` - the Claude-vs-search comparison table and the
    search figures
+7. `make_did_spaghetti.R` / `make_politics_arrows.R` - blog versions of the
+   diff-in-diff figures (Free Systems style; shared styling in
+   `_freesystems_style.R`), written as pdf + png
 
 `code/memo/master_memo.R` builds the separate descriptive memo (AH).
 
