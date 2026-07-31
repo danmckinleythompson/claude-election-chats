@@ -334,6 +334,31 @@ c("\\begin{tabular}{lccccc}", "\\toprule \\toprule",
   "\\bottomrule \\bottomrule", "\\end{tabular}") |>
   writeLines(file.path(outdir, "generated_specificity_table.tex"))
 
+# --- B2b. Robustness specs, for the post's coefficient figure ---------------
+# Same outcome and design as B1, varying only the control group and the
+# functional form. Written to CSV so the figure cannot drift from the table.
+pol_panel = build_panel("Politics and public record")
+fit_did = function(d, log = FALSE) {
+  m = feols(if (log) log(y) ~ treat_may * post | state_po + release
+            else y ~ treat_may * post | state_po + release,
+            data = d, cluster = ~state_po)
+  nm = "treat_mayTRUE:postTRUE"
+  tibble(est = coef(m)[[nm]], se = se(m)[[nm]],
+         n_states = n_distinct(d$state_po),
+         n_treated = n_distinct(d$state_po[d$treat_may]))
+}
+did_specs = bind_rows(
+  fit_did(pol_panel) |> mutate(spec = "Main specification", units = "pp"),
+  fit_did(pol_panel |> filter(treat_may | primary_date >= as.Date("2026-07-01"))) |>
+    mutate(spec = "Excluding June-primary controls", units = "pp"),
+  fit_did(pol_panel, log = TRUE) |> mutate(spec = "Log share", units = "log"))
+write_csv(did_specs, file.path(outdir, "did_specs.csv"))
+
+lg = did_specs |> filter(units == "log")
+add_macro("logEst", fmt(lg$est)); add_macro("logSE", fmt(lg$se))
+nj = did_specs |> filter(spec == "Excluding June-primary controls")
+add_macro("noJuneEst", fmt(nj$est)); add_macro("noJuneSE", fmt(nj$se))
+
 # --- B3. Permutation / empirical null across all estimable topics -----------
 # Same specification applied to every request topic meeting the coverage
 # thresholds. This is the paper's own randomization-inference check: how

@@ -11,6 +11,28 @@ the Claude and search sides. Deliverable: `draft/aei_memo/aei_memo.pdf`.
 `code/memo/master_memo.R` is Andy Hall's separate descriptive memo pipeline
 (merged from PR #1); don't fold it into master.R.
 
+**R computes, Python draws.** `01_memo_stats.R` owns estimation, tables and
+macros and writes CSVs to `output/memo/`. `code/memo/figures.py` owns EVERY
+chart and reads only those CSVs. Superseded and deletable: `02_memo_figures.R`,
+`fig_defs.R`, `03_post_table_images.R`, `03_post_images.R`, `05_post_brand.R`,
+`04_fig_politics_in_context.R`. (`05_cross_release_series.R` and
+`05_subtopic_did.R` are unrelated and still live.)
+
+**Memo vs post.** One builder per figure, rendered twice. The memo
+(`draft/politics_memo`) gets plain PDFs, keeps its tables, and titles via LaTeX
+`\caption`. The post (`output/post/post_01..08_*.png`, dragged into a Google
+Doc in filename order) is **figures only** -- every finding is carried by a
+figure -- in the Free Systems house style: off-white `#FAFAF7`, teal
+`#2B5B6C`, copper `#C4703E`, header rule + title + subtitle, footer with the
+logo and `freesystems.substack.com`. Brand spec: `~/freesystems/CLAUDE.md`.
+Figure titles **describe what is plotted and never state the conclusion**;
+subtitles carry only neutral orienting facts (geography, month, what does not
+sum). The argument goes in the post's prose, not on the chart.
+
+**Never clean `output/post/` by exclusion.** Other scripts write figures there.
+Delete stale assets from an explicit list (see `figures.py`); a
+delete-what-I-don't-recognise rule destroyed `fig_cross_release_series.png`.
+
 ## Key results
 
 - Claude DiD: +0.10 pp (SE 0.04) on a 0.48% base (~22%); logs +0.24 (SE 0.09).
