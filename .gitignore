@@ -3,6 +3,12 @@ original_data/*
 modified_data/*
 notes/*
 
+# Local working material not part of the blog-post pipeline
+draft/
+code/xarchive/
+output/_archive/
+.playwright-mcp/
+
 # Data formats, belt and suspenders
 *.csv
 *.dta
@@ -26,21 +32,16 @@ __pycache__/*
 .Rhistory
 .DS_Store
 .claude/settings.local.json
-.playwright-mcp/
 
 # Exceptions: small data shipped so a fresh clone runs out of the box
 # (the ~210MB AEI release itself is auto-downloaded by the cleaning script)
 !original_data/primary_dates/
 !original_data/primary_dates/**
-!modified_data/aei_election_topics.csv
-!modified_data/aei_did_data.csv
-
-# Out-of-date full paper draft stays local only
-draft/full_paper_draft_jul2026/
-
-# Ship the small Google Trends pulls and derived search panel too
-!original_data/google_trends/
-!original_data/google_trends/**
-original_data/google_trends/*.json
-!modified_data/google_trends_weekly.csv
-!modified_data/search_did_data.csv
+!modified_data/us_topic_shares.csv
+!modified_data/country_politics.csv
+!modified_data/global_context.csv
+!modified_data/state_topic_panel.csv
+!modified_data/did_panel.csv
+!modified_data/topic_effects.csv
+!modified_data/null_distribution.csv
+*.jpeg

@@ -1,28 +1,27 @@
 # Master script: runs the full pipeline in order
-# Project: do Claude conversations shift toward politics when a state holds
-# its primary? Diff-in-diff on the AEI Apr/May 2026 state-month topic shares,
-# benchmarked against the same design in Google search data.
-# NB: code/memo/master_memo.R (descriptive memo, AH) runs separately.
+# Project: the figures for the Free Systems post "Quantifying the Information
+# Layer" - how people use Claude for politics, and the effect of holding a
+# primary, from the Anthropic Economic Index June 2026 release.
 root = "~/Dropbox/AIElectionResearch"
 
-# Set up the Claude data
-source(file.path(root, "code/clean_aei_election_topics.R"))
-source(file.path(root, "code/prep_aei_did_data.R"))
+# Set up the data (the cleaning script downloads the ~210MB AEI release from
+# Hugging Face on first run)
+source(file.path(root, "code/clean_aei_topics.R"))
+source(file.path(root, "code/prep_did_data.R"))
 
-# Set up the Google search data (see original_data/google_trends/readme.txt
-# for how the raw pulls were collected)
-source(file.path(root, "code/clean_google_trends.R"))
-source(file.path(root, "code/check_google_trends_decode.R"))
-source(file.path(root, "code/prep_search_did_data.R"))
+# Produce estimates
+source(file.path(root, "code/estimate_topic_dids.R"))
 
-# Tables and figures (the table scripts also run the estimation)
-source(file.path(root, "code/make_aei_did_table.R"))
-source(file.path(root, "code/make_aei_politics_did.R"))
-source(file.path(root, "code/make_aei_change_hist.R"))
-source(file.path(root, "code/make_search_did_table.R"))
-source(file.path(root, "code/make_search_did_plot.R"))
-source(file.path(root, "code/make_search_event_study.R"))
-
-# Blog figures in the Free Systems style (shared styling in _freesystems_style.R)
-source(file.path(root, "code/make_did_spaghetti.R"))
+# Figures, in the order they appear in the post (shared styling in
+# _blog_style.R; each writes pdf + png twins to output/)
+source(file.path(root, "code/make_us_topic_shares.R"))
+source(file.path(root, "code/make_taxonomy_levels.R"))
+source(file.path(root, "code/make_country_shares.R"))
+source(file.path(root, "code/make_artifacts_dumbbell.R"))
+source(file.path(root, "code/make_topic_outputs.R"))
+source(file.path(root, "code/make_politics_composition.R"))
 source(file.path(root, "code/make_politics_arrows.R"))
+source(file.path(root, "code/make_did_group_change.R"))
+source(file.path(root, "code/make_did_spaghetti.R"))
+source(file.path(root, "code/make_topic_effects.R"))
+source(file.path(root, "code/make_tstat_distribution.R"))

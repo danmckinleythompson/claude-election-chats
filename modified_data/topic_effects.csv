@@ -1,0 +1,7 @@
+topic,lvl,n_states,n_treated,est,se,t,spec,group
+Politics and public record,1,30,8,0.10374999999999998,0.039715032354420976,2.6123609587957644,Main specification,politics
+Politics and public record,1,20,8,0.09374999999999993,0.042418194321062946,2.210136511007682,Excluding June-primary controls,politics
+Geopolitics and strategy,1,16,4,-0.005833333333333334,0.01512520471910401,-0.3856697110331006,Geopolitics and strategy,comparison
+News aggregation,0,26,6,-0.03599999999999996,0.03077285268844982,-1.1698622927315439,News aggregation,comparison
+News writing,0,16,4,-0.0175,0.03180811321677599,-0.5501740980590538,News writing,comparison
+Personal finance,0,25,6,-0.013508771929824553,0.030696190931805194,-0.44007974669677113,Personal finance,comparison

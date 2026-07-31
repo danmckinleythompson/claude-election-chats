@@ -1,51 +1,59 @@
 # claude-election-chats
 
-Do Claude conversations shift toward politics when a state holds its primary?
-A difference-in-differences on the Anthropic Economic Index's public state-month
-topic shares (April vs May 2026), using the staggered 2026 primary calendar.
+Replication code for the Free Systems post "Quantifying the Information
+Layer": how people use Claude for politics, and what happens when a state
+holds a primary, from the Anthropic Economic Index's June 2026 release
+(state-month conversation topic shares, April and May 2026).
 
-Main result: holding a May primary raises a state's politics-topic conversation
-share by 0.10 percentage points (s.e. 0.04) on a 0.48 percent base, about 22
-percent. Write-up: `draft/aei_memo/aei_memo.pdf`.
-
-The same design run in Google search data ("primary election" interest,
-weekly by state) gives a proportional response about twice as large, and its
-longer panel supports the parallel-trends and anticipation checks the
-two-month AEI window cannot.
-
-## Pipeline
-
-`code/master.R` runs everything in order:
-
-1. `clean_aei_election_topics.R` - extract topic shares from the AEI June 2026
-   release (CC-BY, https://huggingface.co/datasets/Anthropic/EconomicIndex)
-2. `prep_aei_did_data.R` - merge hand-compiled 2026 primary dates (NCSL/FVAP),
-   build the treatment and the balanced 30-state panel
-3. `clean_google_trends.R` / `check_google_trends_decode.R` /
-   `prep_search_did_data.R` - build the state-month search panel from the raw
-   Trends pulls in `original_data/google_trends/` (see its readme for how they
-   were collected) and validate them against Google's own export
-4. `make_aei_did_table.R` - estimate the three Claude specifications, write the table
-5. `make_aei_politics_did.R` / `make_aei_change_hist.R` - the two Claude figures
-6. `make_search_did_table.R` / `make_search_did_plot.R` /
-   `make_search_event_study.R` - the Claude-vs-search comparison table and the
-   search figures
-7. `make_did_spaghetti.R` / `make_politics_arrows.R` - blog versions of the
-   diff-in-diff figures (Free Systems style; shared styling in
-   `_freesystems_style.R`), written as pdf + png
-
-`code/memo/master_memo.R` builds the separate descriptive memo (AH).
+Headline result: when a state holds its May 2026 primary, the share of its
+Claude conversations about politics rises by 0.10 percentage points
+(s.e. 0.04) relative to later-primary states - about 22 percent. The same
+design run on all 210 estimable topic series puts the politics t-statistic
+3rd of 210 (randomization-inference p = 0.024).
 
 ## Running it
 
-The repo runs out of the box: `Rscript code/master.R` reproduces everything.
-The cleaning script downloads the AEI release CSV (~210MB, too large for
-GitHub) from Hugging Face on first run. Everything else ships with the repo:
-the hand-compiled primary calendar (`original_data/primary_dates/`), the raw
-Google Trends pulls (`original_data/google_trends/`), and the derived analysis
-files in `modified_data/`, so the tables and figures can also be reproduced
-without the big download by running only the `make_*` scripts. R dependencies:
-pacman, tidyverse, fixest, glue, broom.
+`Rscript code/master.R` reproduces every figure in the post. The cleaning
+script downloads the AEI release CSV (~210MB, too large for GitHub) from
+Hugging Face on first run; everything else ships with the repo, including the
+hand-compiled 2026 primary calendar (`original_data/primary_dates/`, sources
+in its readme) and the derived analysis files in `modified_data/`, so the
+figures can also be rebuilt without the big download by running only the
+`make_*` scripts. R dependencies: pacman, tidyverse, fixest, glue, cowplot,
+patchwork, tidytext.
 
-`code/xarchive/` holds an archived earlier pipeline that benchmarked the result
-against a Google Trends event study around the same primaries.
+## Pipeline
+
+1. `clean_aei_topics.R` - extract US/country/global/state topic shares and
+   context metrics from the AEI release (CC-BY,
+   https://huggingface.co/datasets/Anthropic/EconomicIndex)
+2. `prep_did_data.R` - the politics diff-in-diff panel: balanced Apr/May
+   state panel with primary-timing treatment (March-primary states excluded)
+3. `estimate_topic_dids.R` - the politics estimates (main and excluding
+   June-primary controls), four pre-specified comparison topics, and the
+   same design on every estimable topic (the empirical null)
+4. `make_*.R` - one script per figure, in post order; shared styling in
+   `_blog_style.R`; each writes pdf + png to `output/`
+
+| Figure | Script |
+|---|---|
+| Share of US conversations, by request topic | `make_us_topic_shares.R` |
+| Political and news topic shares, by taxonomy level | `make_taxonomy_levels.R` |
+| Politics-topic share, by country | `make_country_shares.R` |
+| Artifacts produced: politics vs. all conversations | `make_artifacts_dumbbell.R` |
+| Conversation outputs, by political topic | `make_topic_outputs.R` |
+| Composition of political conversations | `make_politics_composition.R` |
+| Change in politics-topic share, by state | `make_politics_arrows.R` |
+| Group-average change summary | `make_did_group_change.R` |
+| Politics-topic share before and after a primary | `make_did_spaghetti.R` |
+| Estimated effect of a May primary, by topic | `make_topic_effects.R` |
+| t-statistics across all estimable topics | `make_tstat_distribution.R` |
+
+## Notes on the data
+
+- A missing state-topic cell means "below the AEI privacy threshold," not
+  zero; values are published rounded to two decimals.
+- Topic names can repeat across hierarchy levels in this release, so
+  everything is keyed on (topic, level).
+- Topic taxonomies are re-estimated in each AEI release; nothing here
+  compares shares across releases.

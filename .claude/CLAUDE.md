@@ -1,15 +1,13 @@
 # AIElectionResearch
 
-Do Claude conversations shift toward politics when a state holds its primary?
-Diff-in-differences on the Anthropic Economic Index state-month topic shares
-(April vs May 2026), using the staggered 2026 primary calendar, benchmarked
-against the same design in Google search data.
+Replication repo for the Free Systems post "Quantifying the Information
+Layer" (with Andy Hall): descriptives on political Claude usage plus the
+primary-timing diff-in-diff, all from the AEI June 2026 release.
 
 **Language:** R (tidyverse, fixest). Entry point: `code/master.R` —
-clean -> prep -> tables (which also run the estimation) -> figures, for both
-the Claude and search sides. Deliverable: `draft/aei_memo/aei_memo.pdf`.
-`code/memo/master_memo.R` is Andy Hall's separate descriptive memo pipeline
-(merged from PR #1); don't fold it into master.R.
+clean -> prep -> estimate -> one make_ script per blog figure (11 figures,
+styling in `_blog_style.R` matched to the post's tan/teal charts).
+The post's Google Doc is the source of truth for which figures exist.
 
 ## Key results
 
@@ -39,10 +37,14 @@ the Claude and search sides. Deliverable: `draft/aei_memo/aei_memo.pdf`.
   only; TN holds county primaries in early May despite its Aug 6 statewide
   date; WI had an Apr 7 spring election.
 
-## Archived (kept, not deleted)
+## Archived (kept locally, untracked in git since the blog-post refocus)
 
-- `code/xarchive/`: the full earlier pipeline — Google Trends collection
-  (SVG-decode approach, see notes/google_trends_pull_notes.txt), the search
-  event study, national series figures, and the four-release AEI extraction.
-- Raw Google Trends pulls remain in `original_data/_archive/google_trends/`
-  (immutable); derived Trends data are in `modified_data/_archive/`.
+- `code/xarchive/`: everything superseded — the Google Trends pipeline
+  (SVG-decode collection, search DiD/event study), the memo-era AEI scripts,
+  the Free Systems blue/gray styling, and Andy's original memo pipeline
+  (`xarchive/memo/`).
+- `draft/`: the aei_memo, Andy's politics_memo, and the frozen full paper —
+  all superseded by the blog post, all still in Dropbox.
+- `output/_archive/` and `modified_data/_archive/`: superseded exhibits and
+  derived data. Raw Google Trends pulls: `original_data/google_trends/`
+  (untracked) and `original_data/_archive/google_trends/`.
