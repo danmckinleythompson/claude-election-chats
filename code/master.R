@@ -22,3 +22,7 @@ source(file.path(root, "code/make_aei_change_hist.R"))
 source(file.path(root, "code/make_search_did_table.R"))
 source(file.path(root, "code/make_search_did_plot.R"))
 source(file.path(root, "code/make_search_event_study.R"))
+
+# Blog figures in the Free Systems style (shared styling in _freesystems_style.R)
+source(file.path(root, "code/make_did_spaghetti.R"))
+source(file.path(root, "code/make_politics_arrows.R"))

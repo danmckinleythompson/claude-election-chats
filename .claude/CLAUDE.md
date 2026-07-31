@@ -14,6 +14,7 @@ the Claude and search sides. Deliverable: `draft/aei_memo/aei_memo.pdf`.
 ## Key results
 
 - Claude DiD: +0.10 pp (SE 0.04) on a 0.48% base (~22%); logs +0.24 (SE 0.09).
+  Robust to dropping June controls, logs, and dropping LA/WI/DC/TN.
 - Search, same design/sample/logs: +0.49 (SE 0.17) — about twice the
   proportional response. Pre-trends parallel (joint p=0.10 vs March); April
   already +0.63 (anticipation), so the DiDs are lower bounds.
@@ -37,8 +38,6 @@ the Claude and search sides. Deliverable: `draft/aei_memo/aei_memo.pdf`.
   (NCSL + FVAP, they agree). Watch-outs: LA's May 16 primary is Senate/local
   only; TN holds county primaries in early May despite its Aug 6 statewide
   date; WI had an Apr 7 spring election.
-- Main estimate: +0.10 pp (SE 0.04) on a 0.48% control base (~22%); robust to
-  dropping June controls, logs, and dropping LA/WI/DC/TN.
 
 ## Archived (kept, not deleted)
 
