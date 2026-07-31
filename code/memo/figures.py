@@ -507,6 +507,18 @@ def f6_arrows(axes, pal, fig):
                                     mutation_scale=11, shrinkA=0, shrinkB=0),
                     zorder=3)
         ax.scatter(r.apr, y, s=46 if is_avg else 26, color=col, zorder=4)
+        if is_avg:
+            # Print the change on the two summary rows. The later-primary
+            # average moves by exactly 0.00 (10 states up, 11 down, 1 flat,
+            # cancelling), so its arrow has zero length and collapses to the
+            # dot -- without this label that reads as missing data rather than
+            # as the flat control trend the design turns on.
+            chg = r.may - r.apr
+            chg_txt = "0.00 pp" if abs(chg) < 0.005 else f"{chg:+.2f} pp"
+            ax.text(max(r.apr, r.may) + 0.018, y,
+                    f"{r.apr:.2f} to {r.may:.2f}  ({chg_txt})",
+                    va="center", ha="left", fontsize=pal["base"] - 0.5,
+                    fontweight="bold", color=col, zorder=5)
         labels.append(r.label)
 
     ax.axhline(sep_y, color=pal["rule"], lw=0.8, zorder=2)
