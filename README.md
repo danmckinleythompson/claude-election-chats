@@ -19,8 +19,10 @@ Hugging Face on first run; everything else ships with the repo, including the
 hand-compiled 2026 primary calendar (`original_data/primary_dates/`, sources
 in its readme) and the derived analysis files in `modified_data/`, so the
 figures can also be rebuilt without the big download by running only the
-`make_*` scripts. R dependencies: pacman, tidyverse, fixest, glue, cowplot,
-patchwork, tidytext.
+`make_*` scripts. Hand-compiled inputs (2026 primary dates and primary
+turnout) ship in `original_data/` with per-number source documentation in
+their readmes. R dependencies: pacman, tidyverse, fixest, glue, cowplot,
+patchwork, tidytext, ggrepel.
 
 ## Pipeline
 
@@ -48,6 +50,7 @@ patchwork, tidytext.
 | Politics-topic share before and after a primary | `make_did_spaghetti.R` |
 | Estimated effect of a May primary, by topic | `make_topic_effects.R` |
 | t-statistics across all estimable topics | `make_tstat_distribution.R` |
+| Politics-share change vs. primary turnout | `make_turnout_scatter.R` |
 
 ## Notes on the data
 

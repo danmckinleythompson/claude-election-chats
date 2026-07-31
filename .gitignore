@@ -45,3 +45,5 @@ __pycache__/*
 !modified_data/topic_effects.csv
 !modified_data/null_distribution.csv
 *.jpeg
+!original_data/primary_turnout/
+!original_data/primary_turnout/**

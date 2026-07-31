@@ -28,7 +28,8 @@ blog_theme = function(base_size = 13) {
 
 # Frame a plot in the house chrome: teal accent bar top-left, footer rule,
 # "Free Systems" at left, source and site at right; pdf + png twins to output/
-blog_save = function(fig, stem, height, width) {
+blog_save = function(fig, stem, height, width,
+                     source = "Source: Anthropic Economic Index, 2026-06-26 release. Shares are of classified conversations.") {
   final = cowplot::ggdraw(xlim = c(0, 1), ylim = c(0, 1)) +
     cowplot::draw_plot(fig, x = 0.015, y = 0.075, width = 0.97, height = 0.895) +
     cowplot::draw_line(x = c(0.045, 0.105), y = c(0.978, 0.978),
@@ -37,8 +38,8 @@ blog_save = function(fig, stem, height, width) {
                        color = blog_border, linewidth = 0.5) +
     cowplot::draw_label("Free Systems", x = 0.045, y = 0.038, hjust = 0,
                         size = 10.5, fontface = "bold", color = blog_dark) +
-    cowplot::draw_label("Source: Anthropic Economic Index, 2026-06-26 release. Shares are of classified conversations.",
-                        x = 0.965, y = 0.044, hjust = 1, size = 8, color = "gray45") +
+    cowplot::draw_label(source, x = 0.965, y = 0.044, hjust = 1, size = 8,
+                        color = "gray45") +
     cowplot::draw_label("freesystems.substack.com", x = 0.965, y = 0.022, hjust = 1,
                         size = 9, fontface = "bold", color = blog_teal) +
     theme(plot.background = element_rect(fill = blog_bg, color = blog_border,
