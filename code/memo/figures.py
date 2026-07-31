@@ -57,7 +57,8 @@ MEMO_PAL = dict(
     bar="#B2182B", accent="#B2182B", muted="#737373", flat="#B7B7B7",
     series3={"Information": "#B2182B", "Action": "#2166AC", "Document": "#E08214"},
     bg="white", ink="#404040", axis="#4D4D4D", grid="#EAEAEA",
-    strip="#4D4D4D", rule="#8C8C8C", base=11, family="DejaVu Sans")
+    strip="#4D4D4D", rule="#8C8C8C", light="#E0A8AF", base=11,
+    family="DejaVu Sans")
 
 FS = dict(
     bar="#2B5B6C", accent="#2B5B6C", muted="#8C8C86", flat="#B9B8AE",
@@ -67,7 +68,8 @@ FS = dict(
     # -- so every series is also directly labelled, the documented relief.
     series3={"Information": "#2B5B6C", "Action": "#8C8C86", "Document": "#C4703E"},
     bg="#FAFAF7", ink="#3D3D38", axis="#3D3D38", grid="#E3E2DA",
-    strip="#6B6B63", rule="#C9C8BE", base=11, family="Avenir Next")
+    strip="#6B6B63", rule="#C9C8BE", light="#9FBAC2", base=11,
+    family="Avenir Next")
 
 
 # --- shared chart furniture -------------------------------------------------
@@ -125,7 +127,8 @@ def bottom_legend(fig, handles, labels, pal, ncol):
 
 
 # --- figure canvas ----------------------------------------------------------
-def make_canvas(chart_w, chart_h, row_counts, pal, branded, left_in, bottom_in):
+def make_canvas(chart_w, chart_h, row_counts, pal, branded, left_in, bottom_in,
+                head_in=None, gap=0.35):
     """Figure sized so the plotting area is exactly chart_w x chart_h inches.
 
     Panels stack with heights proportional to their row counts, so a three-row
@@ -136,13 +139,12 @@ def make_canvas(chart_w, chart_h, row_counts, pal, branded, left_in, bottom_in):
                 all of which matplotlib draws OUTSIDE the axes rectangle, so
                 without this they render straight over the footer.
     """
-    head = HEAD if branded else 0.12
+    head = (head_in or HEAD) if branded else 0.12
     foot = FOOT if branded else 0.10
     W = chart_w + 2 * PAD
     H = chart_h + head + foot + bottom_in
     fig = plt.figure(figsize=(W, H), facecolor=pal["bg"])
     fig.fs_foot = foot
-    gap = 0.35                                   # inches between panels
     usable = chart_h - gap * (len(row_counts) - 1)
     heights = [usable * c / sum(row_counts) for c in row_counts]
 
@@ -467,6 +469,124 @@ def f7_null(axes, pal, fig):
             f"series.\nUS states, April to May 2026.")
 
 
+def _did_panel():
+    """The estimation sample Dan's two blog figures use: the balanced Apr/May
+    state panel with March-primary states dropped."""
+    d = pd.read_csv(ROOT / "modified_data" / "aei_did_data.csv")
+    return d[~d.march_primary]
+
+
+def f6_arrows(axes, pal, fig):
+    """Ported from code/make_politics_arrows.R (D. Thompson) into the post's
+    palette. Same data, same ordering, same annotations."""
+    d = _did_panel()
+    w = (d.pivot_table(index=["state_po", "treat_may"], columns="post",
+                       values="politics_broad").reset_index()
+         .rename(columns={False: "apr", True: "may"}))
+    avg = (w.groupby("treat_may")[["apr", "may"]].mean().reset_index()
+           .assign(label=lambda x: np.where(x.treat_may, "Avg. May-primary state",
+                                            "Avg. later-primary state")))
+    w = w.sort_values("apr", ascending=False)
+    w["label"] = w.state_po
+
+    ax = axes[0]
+    # States top-down by April share, a rule, then the two group averages.
+    rows = list(w.itertuples()) + [None] + list(
+        avg.sort_values("treat_may", ascending=False).itertuples())
+    labels, sep_y = [], None
+    for y, r in enumerate(rows):
+        if r is None:
+            sep_y = y
+            labels.append("")
+            continue
+        is_avg = not hasattr(r, "state_po")
+        col = pal["accent"] if r.treat_may else (pal["muted"] if is_avg else pal["light"])
+        ax.annotate("", xy=(r.may, y), xytext=(r.apr, y),
+                    arrowprops=dict(arrowstyle="-|>", color=col,
+                                    linewidth=2.0 if is_avg else 1.2,
+                                    mutation_scale=11, shrinkA=0, shrinkB=0),
+                    zorder=3)
+        ax.scatter(r.apr, y, s=46 if is_avg else 26, color=col, zorder=4)
+        labels.append(r.label)
+
+    ax.axhline(sep_y, color=pal["rule"], lw=0.8, zorder=2)
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels(labels)
+    for t, r in zip(ax.get_yticklabels(), rows):
+        if r is not None and not hasattr(r, "state_po"):
+            t.set_fontweight("bold")      # the two group averages only
+    ax.set_ylim(len(rows) - 0.4, -0.6)
+    ax.set_xlim(0.28, 1.14)
+    style_axes(ax, pal)
+    ax.text(0.80, 3.0, "Dot = April share\nArrow tip = May share", ha="left",
+            va="center", fontsize=pal["base"], color=pal["strip"], linespacing=1.4)
+    ax.text(0.80, 7.4, "Teal states held\nMay 2026 primaries", ha="left",
+            va="center", fontsize=pal["base"], color=pal["accent"],
+            fontweight="bold", linespacing=1.4)
+    ax.set_xlabel("% of the state's Claude conversations about politics",
+                  fontsize=pal["base"] + 1, color=pal["axis"], labelpad=8)
+    return ("Change in Politics-Topic Share, by State",
+            "April to May 2026. States ordered by April share; group averages "
+            "unweighted.\nMarch-primary states (TX, NC, IL) excluded, as are "
+            "states below the AEI privacy threshold.")
+
+
+def f7_spaghetti(axes, pal, fig):
+    """Ported from code/make_did_spaghetti.R (D. Thompson) into the post's
+    palette. Same data, same three panels, same y range."""
+    d = _did_panel().assign(x=lambda t: np.where(t.post, 2, 1))
+    means = d.groupby(["treat_may", "x"]).politics_broad.mean().reset_index()
+    n = d.groupby("treat_may").state_po.nunique()
+
+    def panel(ax, treated, light, dark, title, ylab):
+        for st, g in d[d.treat_may == treated].groupby("state_po"):
+            g = g.sort_values("x")
+            ax.plot(g.x, g.politics_broad, color=light, lw=1.1, zorder=2)
+        m = means[means.treat_may == treated].sort_values("x")
+        ax.plot(m.x, m.politics_broad, color=dark, lw=2.8, zorder=4)
+        ax.scatter(m.x, m.politics_broad, color=dark, s=52, zorder=5)
+        ax.text(2.08, m.politics_broad.iloc[-1], "Average", color=dark,
+                fontsize=pal["base"], fontweight="bold", va="center", zorder=5)
+        ax.set_title(title, loc="left", fontsize=pal["base"] + 1,
+                     fontweight="bold", color="#1A1A18", pad=7)
+        if ylab:
+            ax.set_ylabel(ylab, fontsize=pal["base"], color=pal["axis"], labelpad=8)
+
+    panel(axes[0], True, pal["light"], pal["accent"],
+          f"States with May 2026 primaries ({n[True]})", None)
+    panel(axes[1], False, "#D6D5CC", pal["muted"],
+          f"States with June-September primaries ({n[False]})",
+          "% of the state's Claude conversations about politics")
+
+    ax = axes[2]
+    for treated, col, ls, lab, dy in ((True, pal["accent"], "-", "May primary", 0.028),
+                                      (False, pal["muted"], (0, (4, 2)),
+                                       "Later primary", -0.001)):
+        m = means[means.treat_may == treated].sort_values("x")
+        ax.plot(m.x, m.politics_broad, color=col, lw=2.8, ls=ls, zorder=4)
+        ax.scatter(m.x, m.politics_broad, color=col, s=52, zorder=5)
+        ax.text(2.08, m.politics_broad.iloc[-1] + dy, lab, color=col,
+                fontsize=pal["base"], fontweight="bold", va="center")
+    ax.set_title("The averages, compared", loc="left", fontsize=pal["base"] + 1,
+                 fontweight="bold", color="#1A1A18", pad=7)
+
+    for i, ax in enumerate(axes):
+        style_axes(ax, pal, xgrid=False)
+        ax.grid(axis="y", color=pal["grid"], linewidth=0.7, zorder=0)
+        ax.tick_params(axis="y", length=3)
+        ax.set_xticks([1, 2])
+        # All three panels share one x axis; labelling each would collide with
+        # the next panel's title.
+        ax.set_xticklabels(["April 2026", "May 2026"] if i == len(axes) - 1
+                           else ["", ""])
+        ax.set_xlim(0.85, 2.75)
+        ax.set_ylim(0.30, 0.75)
+    return ("Politics-Topic Share Before and After a State's Primary",
+            "Each thin line is one state; the bold line is the unweighted group "
+            "average.\nMarch-primary states excluded; DC (1.0-1.1%) is above the "
+            "plotted range.")
+
+
 # --- registry ---------------------------------------------------------------
 # rows: relative panel heights (number of bars). left: inches reserved for the
 # y tick labels, plus the strip column where there is one.
@@ -483,9 +603,14 @@ FIGS = [
          w=9.6, h=5.2, rows=[1], left=2.2, bottom=1.1, memo=False),
     dict(key="composition", fn=f5_composition, out="post_06_F5_how_conducted",
          w=10.6, h=5.8, rows=[3, 2, 6], left=4.6, bottom=0.66, memo=False),
-    dict(key="did_estimates", fn=f6_did, out="post_07_F6_did_estimates",
+    dict(key="politics_arrows", fn=f6_arrows, out="post_07_F6_politics_arrows",
+         w=8.0, h=9.2, rows=[1], left=1.5, bottom=0.66, memo=False),
+    dict(key="did_spaghetti", fn=f7_spaghetti, out="post_08_F7_did_spaghetti",
+         w=7.6, h=8.0, rows=[1, 1, 1], left=1.5, bottom=0.66, memo=False,
+         head=1.72, gap=0.62),   # room for the per-panel titles
+    dict(key="did_estimates", fn=f6_did, out="post_09_F8_did_estimates",
          w=9.8, h=4.6, rows=[2, 4], left=3.4, bottom=0.66, memo=False),
-    dict(key="null_distribution", fn=f7_null, out="post_08_F7_null_distribution",
+    dict(key="null_distribution", fn=f7_null, out="post_10_F9_null_distribution",
          w=8.4, h=5.0, rows=[1], left=1.0, bottom=0.66, memo=True),
 ]
 
@@ -498,7 +623,8 @@ def render(spec, pal, branded, path):
     plt.rcParams["mathtext.rm"] = pal["family"]
     plt.rcParams["mathtext.it"] = f"{pal['family']}:italic"
     fig, axes, W, H = make_canvas(spec["w"], spec["h"], spec["rows"], pal,
-                                  branded, spec["left"], spec["bottom"])
+                                  branded, spec["left"], spec["bottom"],
+                                  spec.get("head"), spec.get("gap", 0.35))
     title, subtitle = spec["fn"](axes, pal, fig)
     finish(fig, W, H, pal, title, subtitle, branded)
     fig.savefig(path, dpi=DPI, facecolor=pal["bg"])
@@ -522,6 +648,8 @@ def main():
         "post_08_T5_did.png", "post_09_T6_specificity.png",
         "post_10_F4_null_distribution.png", "post_11_T7_null_top.png",
         "fig_politics_in_context.pdf", "_tex",
+        # superseded when Dan's two figures were slotted in ahead of these
+        "post_07_F6_did_estimates.png", "post_08_F7_null_distribution.png",
     ]
     for name in stale:
         p = POST / name

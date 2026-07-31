@@ -20,7 +20,7 @@ chart and reads only those CSVs. Superseded and deletable: `02_memo_figures.R`,
 
 **Memo vs post.** One builder per figure, rendered twice. The memo
 (`draft/politics_memo`) gets plain PDFs, keeps its tables, and titles via LaTeX
-`\caption`. The post (`output/post/post_01..08_*.png`, dragged into a Google
+`\caption`. The post (`output/post/post_01..10_*.png`, dragged into a Google
 Doc in filename order) is **figures only** -- every finding is carried by a
 figure -- in the Free Systems house style: off-white `#FAFAF7`, teal
 `#2B5B6C`, copper `#C4703E`, header rule + title + subtitle, footer with the
@@ -28,6 +28,14 @@ logo and `freesystems.substack.com`. Brand spec: `~/freesystems/CLAUDE.md`.
 Figure titles **describe what is plotted and never state the conclusion**;
 subtitles carry only neutral orienting facts (geography, month, what does not
 sum). The argument goes in the post's prose, not on the chart.
+
+**Two Free Systems styles exist; the teal one wins.** `code/_freesystems_style.R`
+(DT) is blue `#2E74C0` on white with centred titles, colours read off earlier
+posted charts. The post uses the website design system instead (teal/copper +
+logo). `make_politics_arrows.R` and `make_did_spaghetti.R` are ported into
+`figures.py` as F6 and F7 for the post; the R originals still run under
+`code/master.R` and still write their blue twins to `output/`, which are NOT
+post assets. Restyle or retire them before they get mixed in.
 
 **Never clean `output/post/` by exclusion.** Other scripts write figures there.
 Delete stale assets from an explicit list (see `figures.py`); a
