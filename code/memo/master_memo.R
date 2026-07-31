@@ -12,6 +12,7 @@ root = if (dir.exists("original_data")) normalizePath(".") else "~/Dropbox/AIEle
 
 source(file.path(root, "code/memo/01_memo_stats.R"))    # all numbers -> output/memo/
 source(file.path(root, "code/memo/02_memo_figures.R"))  # all figures -> output/memo/
+source(file.path(root, "code/memo/03_post_table_images.R"))  # post images -> output/post/
 
 # Compile the draft twice so refs resolve
 memo = file.path(root, "draft/politics_memo")

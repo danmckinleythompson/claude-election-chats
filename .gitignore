@@ -44,3 +44,6 @@ draft/full_paper_draft_jul2026/
 original_data/google_trends/*.json
 !modified_data/google_trends_weekly.csv
 !modified_data/search_did_data.csv
+
+# LaTeX scratch from rendering post tables to images
+output/post/_tex/
