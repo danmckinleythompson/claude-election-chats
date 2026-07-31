@@ -45,7 +45,18 @@ ggsave(file.path(root, "output/search_event_study.pdf"), plot = fig,
 ##
 
 pre = grep("2025-|2026-01|2026-02", names(coef(m_es)), value = TRUE)
+lead_test = wald(m_es, keep = pre, print = FALSE)
 cat("\nJoint test, Jul 2025-Feb 2026 leads = 0 (parallel pre-trends):\n")
-print(wald(m_es, keep = pre))
+print(lead_test)
 cat("\nApril (anticipation) and May (primary month) relative to March:\n")
 print(round(coeftable(m_es)[c("month_f::2026-04:treat_may", "month_f::2026-05:treat_may"), 1:2], 3))
+
+# Write the numbers the memo cites so the text can never drift from the code
+apr = coef(m_es)[["month_f::2026-04:treat_may"]]
+may = coef(m_es)[["month_f::2026-05:treat_may"]]
+fmt2 = function(x, d = 2) formatC(x, format = "f", digits = d)
+c(sprintf("\\newcommand{\\searchLeadP}{%s}", fmt2(lead_test$p, 3)),
+  sprintf("\\newcommand{\\searchNLeads}{%d}", length(pre)),
+  sprintf("\\newcommand{\\searchAprCoef}{%s}", fmt2(apr)),
+  sprintf("\\newcommand{\\searchMayCoef}{%s}", fmt2(may))) |>
+  writeLines(file.path(root, "output/generated_search_numbers.tex"))
