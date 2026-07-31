@@ -478,69 +478,76 @@ def _did_panel():
 
 def f6_arrows(axes, pal, fig):
     """Ported from code/make_politics_arrows.R (D. Thompson) into the post's
-    palette. Same data, same ordering, same annotations."""
+    palette, with the group averages split into their own panel.
+
+    Why two panels: on a levels axis the later-primary average (0.48, flat) sits
+    INSIDE the May-primary arrow's span (0.40 -> 0.51), so the eye compares
+    where the groups ended up and reads them as much the same. The question is
+    how far each MOVED, and a zero-length arrow has no visual weight at all.
+    The lower panel puts both changes on a change axis against a zero line,
+    where +0.10 against nothing is unmissable.
+    """
     d = _did_panel()
     w = (d.pivot_table(index=["state_po", "treat_may"], columns="post",
                        values="politics_broad").reset_index()
          .rename(columns={False: "apr", True: "may"}))
-    avg = (w.groupby("treat_may")[["apr", "may"]].mean().reset_index()
-           .assign(label=lambda x: np.where(x.treat_may, "Avg. May-primary state",
-                                            "Avg. later-primary state")))
+    avg = w.groupby("treat_may")[["apr", "may"]].mean()
+    n = w.groupby("treat_may").state_po.count()
     w = w.sort_values("apr", ascending=False)
-    w["label"] = w.state_po
 
+    # --- panel 1: every state, in levels ------------------------------------
     ax = axes[0]
-    # States top-down by April share, a rule, then the two group averages.
-    rows = list(w.itertuples()) + [None] + list(
-        avg.sort_values("treat_may", ascending=False).itertuples())
-    labels, sep_y = [], None
-    for y, r in enumerate(rows):
-        if r is None:
-            sep_y = y
-            labels.append("")
-            continue
-        is_avg = not hasattr(r, "state_po")
-        col = pal["accent"] if r.treat_may else (pal["muted"] if is_avg else pal["light"])
+    for y, r in enumerate(w.itertuples()):
+        col = pal["accent"] if r.treat_may else pal["light"]
         ax.annotate("", xy=(r.may, y), xytext=(r.apr, y),
-                    arrowprops=dict(arrowstyle="-|>", color=col,
-                                    linewidth=2.0 if is_avg else 1.2,
+                    arrowprops=dict(arrowstyle="-|>", color=col, linewidth=1.2,
                                     mutation_scale=11, shrinkA=0, shrinkB=0),
                     zorder=3)
-        ax.scatter(r.apr, y, s=46 if is_avg else 26, color=col, zorder=4)
-        if is_avg:
-            # Print the change on the two summary rows. The later-primary
-            # average moves by exactly 0.00 (10 states up, 11 down, 1 flat,
-            # cancelling), so its arrow has zero length and collapses to the
-            # dot -- without this label that reads as missing data rather than
-            # as the flat control trend the design turns on.
-            chg = r.may - r.apr
-            chg_txt = "0.00 pp" if abs(chg) < 0.005 else f"{chg:+.2f} pp"
-            ax.text(max(r.apr, r.may) + 0.018, y,
-                    f"{r.apr:.2f} to {r.may:.2f}  ({chg_txt})",
-                    va="center", ha="left", fontsize=pal["base"] - 0.5,
-                    fontweight="bold", color=col, zorder=5)
-        labels.append(r.label)
-
-    ax.axhline(sep_y, color=pal["rule"], lw=0.8, zorder=2)
-    ax.set_yticks(range(len(rows)))
-    ax.set_yticklabels(labels)
-    for t, r in zip(ax.get_yticklabels(), rows):
-        if r is not None and not hasattr(r, "state_po"):
-            t.set_fontweight("bold")      # the two group averages only
-    ax.set_ylim(len(rows) - 0.4, -0.6)
+        ax.scatter(r.apr, y, s=26, color=col, zorder=4)
+    ax.set_yticks(range(len(w)))
+    ax.set_yticklabels(w.state_po)
+    ax.set_ylim(len(w) - 0.4, -0.6)
     ax.set_xlim(0.28, 1.14)
     style_axes(ax, pal)
-    ax.text(0.80, 3.0, "Dot = April share\nArrow tip = May share", ha="left",
+    ax.text(0.80, 2.4, "Dot = April share\nArrow tip = May share", ha="left",
             va="center", fontsize=pal["base"], color=pal["strip"], linespacing=1.4)
-    ax.text(0.80, 7.4, "Teal states held\nMay 2026 primaries", ha="left",
+    ax.text(0.80, 6.6, "Teal states held\nMay 2026 primaries", ha="left",
             va="center", fontsize=pal["base"], color=pal["accent"],
             fontweight="bold", linespacing=1.4)
     ax.set_xlabel("% of the state's Claude conversations about politics",
                   fontsize=pal["base"] + 1, color=pal["axis"], labelpad=8)
+
+    # --- panel 2: the two group averages, as change -------------------------
+    ax2 = axes[1]
+    groups = [(True, pal["accent"], f"May-primary states ({n[True]})"),
+              (False, pal["muted"], f"Later-primary states ({n[False]})")]
+    ax2.axvline(0, color=pal["axis"], lw=1.0, zorder=2)
+    for y, (treated, col, lab) in enumerate(groups):
+        chg = avg.may[treated] - avg.apr[treated]
+        ax2.barh(y, chg, height=0.5, color=col, zorder=3)
+        # A marker at zero as well as the bar: the later-primary change is
+        # exactly 0.00, so without it that row would be blank.
+        ax2.scatter(0, y, s=34, color=col, zorder=4)
+        txt = "no change" if abs(chg) < 0.005 else f"{chg:+.2f} pp"
+        ax2.text(max(chg, 0) + 0.006, y, txt, va="center", ha="left",
+                 fontsize=pal["base"], fontweight="bold", color=col, zorder=5)
+    ax2.set_yticks(range(len(groups)))
+    ax2.set_yticklabels([g[2] for g in groups])
+    ax2.set_ylim(len(groups) - 0.4, -0.6)
+    ax2.set_xlim(-0.022, 0.172)
+    ax2.set_xticks([0, 0.05, 0.10, 0.15])
+    ax2.set_xticklabels(["0", "+0.05", "+0.10", "+0.15"])
+    style_axes(ax2, pal)
+    ax2.set_title("The two group averages, compared", loc="left",
+                  fontsize=pal["base"] + 1, fontweight="bold", color="#1A1A18",
+                  pad=7)
+    ax2.set_xlabel("Change in the group's unweighted average, April to May (pp)",
+                   fontsize=pal["base"] + 1, color=pal["axis"], labelpad=8)
+
     return ("Change in Politics-Topic Share, by State",
-            "April to May 2026. States ordered by April share; group averages "
-            "unweighted.\nMarch-primary states (TX, NC, IL) excluded, as are "
-            "states below the AEI privacy threshold.")
+            "April to May 2026. States ordered by April share. March-primary "
+            "states (TX, NC, IL)\nexcluded, as are states below the AEI privacy "
+            "threshold in either month.")
 
 
 def f7_spaghetti(axes, pal, fig):
@@ -616,7 +623,8 @@ FIGS = [
     dict(key="composition", fn=f5_composition, out="post_06_F5_how_conducted",
          w=10.6, h=5.8, rows=[3, 2, 6], left=4.6, bottom=0.66, memo=False),
     dict(key="politics_arrows", fn=f6_arrows, out="post_07_F6_politics_arrows",
-         w=8.0, h=9.2, rows=[1], left=1.5, bottom=0.66, memo=False),
+         w=8.2, h=9.4, rows=[30, 2], left=2.6, bottom=0.66, memo=False,
+         gap=1.15),   # room for panel 1's axis title above panel 2
     dict(key="did_spaghetti", fn=f7_spaghetti, out="post_08_F7_did_spaghetti",
          w=7.6, h=8.0, rows=[1, 1, 1], left=1.5, bottom=0.66, memo=False,
          head=1.72, gap=0.62),   # room for the per-panel titles
