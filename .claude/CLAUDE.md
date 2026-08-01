@@ -11,18 +11,23 @@ the Claude and search sides. Deliverable: `draft/aei_memo/aei_memo.pdf`.
 `code/memo/master_memo.R` is Andy Hall's separate descriptive memo pipeline
 (merged from PR #1); don't fold it into master.R.
 
-**R computes, Python draws.** `01_memo_stats.R` owns estimation, tables and
-macros and writes CSVs to `output/memo/`. `code/memo/figures.py` owns EVERY
-chart and reads only those CSVs. Superseded and deletable: `02_memo_figures.R`,
-`fig_defs.R`, `03_post_table_images.R`, `03_post_images.R`, `05_post_brand.R`,
-`04_fig_politics_in_context.R`. (`05_cross_release_series.R` and
-`05_subtopic_did.R` are unrelated and still live.)
+**The post is Python, end to end.** `python3 code/master.py` runs two stages:
+`code/analysis.py` (cleaning, panel construction, estimation -> derived CSVs in
+`modified_data/`) then `code/figures.py` (those CSVs -> `output/post/`).
+Nothing in analysis draws; nothing in figures estimates. analysis.py checks its
+estimates against the R pipeline it replaced (`EXPECTED`) and exits non-zero if
+they drift -- pyfixest reproduces fixest to <1e-4 on all 13.
 
-**Memo vs post.** One builder per figure, rendered twice. The memo
-(`draft/politics_memo`) gets plain PDFs, keeps its tables, and titles via LaTeX
-`\caption`. The post (`output/post/post_01..10_*.png`, dragged into a Google
-Doc in filename order) is **figures only** -- every finding is carried by a
-figure -- in the Free Systems house style: off-white `#FAFAF7`, teal
+**The last R is the search benchmark.** `code/master.R` now runs only the
+Google Trends robustness chain, which is pending a port to Python.
+`make_aei_did_table.R` / `make_aei_politics_did.R` / `make_aei_change_hist.R`
+recompute what analysis.py already produces; port or retire them together.
+`code/memo/05_cross_release_series.R` and `05_subtopic_did.R` are unrelated and
+still live.
+
+**The post** (`output/post/post_01..11_*.png`, dragged in filename order) is
+**figures only** -- every finding is carried by a figure -- in the Free Systems
+house style: off-white `#FAFAF7`, teal
 `#2B5B6C`, copper `#C4703E`, header rule + title + subtitle, footer with the
 logo and `freesystems.substack.com`. Brand spec: `~/freesystems/CLAUDE.md`.
 Figure titles **describe what is plotted and never state the conclusion**;

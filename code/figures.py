@@ -1,26 +1,20 @@
 #!/usr/bin/env python3
-"""figures.py -- every figure for the politics memo and the Free Systems post.
+"""figures.py -- every figure in the Free Systems post.
 
-    python3 code/memo/figures.py
+    python3 code/analysis.py && python3 code/figures.py
 
-Reads only the CSVs written by code/memo/01_memo_stats.R (R still owns the
-estimation, tables and macros; Python owns every chart). Writes:
+Reads only the CSVs written by code/analysis.py, and draws. Nothing here
+estimates; nothing in analysis.py draws. Writes:
 
-    output/memo/fig_*.pdf   plain, no title/logo -- \\includegraphics'd by
-                            draft/politics_memo, whose LaTeX \\caption does the
-                            titling.
-    output/post/post_0N_*.png  Free Systems branded, header + footer + logo,
-                            numbered in presentation order so the whole set can
-                            be dragged into the Google Doc in sequence.
-
-One builder per figure, so the memo and the post can never disagree about a
-chart. Branding is a wrapper, never a second copy of the chart.
+    output/post/post_NN_*.png  branded, header + footer + logo, numbered in
+                            presentation order so the whole set can be
+                            multi-selected and dragged into the post in order.
 
 TITLES describe what is plotted; they never state the conclusion. Subtitles
 carry only neutral orienting facts -- geography, month, and whatever the reader
-needs in order not to misread the panels (what does not sum, what is not
-comparable). The argument belongs in the post's prose, not stamped on the
-chart. The memo drops both and titles via its LaTeX \caption.
+needs in order not to misread the panel (what does not sum, what is not
+comparable, how few observations there are). The argument belongs in the
+post's prose, not stamped on the chart.
 
 Brand system: ~/freesystems/CLAUDE.md -- off-white #FAFAF7, ink #1A1A18, deep
 teal #2B5B6C, warm copper #C4703E. FONT: the brand faces (Playfair Display,
@@ -39,12 +33,10 @@ import numpy as np
 import pandas as pd
 from matplotlib.patches import Rectangle
 
-ROOT = Path(__file__).resolve().parents[2]
-MEMO = ROOT / "output" / "memo"
+ROOT = Path(__file__).resolve().parents[1]
+DERIV = ROOT / "modified_data"
 POST = ROOT / "output" / "post"
-LOGO = ROOT / "code" / "memo" / "assets" / "free_systems_logo.png"
-AEI = (ROOT / "original_data" / "anthropic_economic_index" /
-       "release_2026_06_26" / "aei_claude_ai_2026-06-26.csv")
+LOGO = ROOT / "code" / "assets" / "free_systems_logo.png"
 
 URL = "freesystems.substack.com"
 SOURCE = ("Source: Anthropic Economic Index, 2026-06-26 release. "
@@ -53,13 +45,6 @@ DPI = 200
 PAD, HEAD, FOOT = 0.34, 1.25, 0.72   # inches: margin, header band, footer band
 
 # --- palettes ---------------------------------------------------------------
-MEMO_PAL = dict(
-    bar="#B2182B", accent="#B2182B", muted="#737373", flat="#B7B7B7",
-    series3={"Information": "#B2182B", "Action": "#2166AC", "Document": "#E08214"},
-    bg="white", ink="#404040", axis="#4D4D4D", grid="#EAEAEA",
-    strip="#4D4D4D", rule="#8C8C8C", light="#E0A8AF", base=11,
-    family="DejaVu Sans")
-
 FS = dict(
     bar="#2B5B6C", accent="#2B5B6C", muted="#8C8C86", flat="#B9B8AE",
     # Teal and copper are the brand's own pair and carry the story (information
@@ -190,24 +175,8 @@ def finish(fig, W, H, pal, title, subtitle, branded):
 # =============================================================================
 
 def _topic_ranking():
-    """USA minor-topic ranking for F0, cached: the raw release is ~210MB."""
-    cache = MEMO / "topic_ranking_usa_may.csv"
-    if cache.exists():
-        return pd.read_csv(cache)
-    aei = pd.read_csv(AEI, usecols=["category_name", "metric_id", "geo_id",
-                                    "date_start", "hierarchy_level",
-                                    "node_name", "value"])
-    # Minor topics are the level at which the outcome is defined, so the
-    # ranking is like-for-like: never an aggregate against a leaf.
-    m = aei[(aei.category_name == "request") & (aei.metric_id == "pct") &
-            (aei.geo_id == "USA") & (aei.date_start == "2026-05-01") &
-            (aei.hierarchy_level == 1)]
-    out = (m[["node_name", "value"]].rename(columns={"node_name": "topic",
-                                                     "value": "pct"})
-           .sort_values("pct", ascending=False).reset_index(drop=True))
-    out["rank"] = out.index + 1
-    out.to_csv(cache, index=False)
-    return out
+    """USA minor-topic ranking, precomputed by analysis.py."""
+    return pd.read_csv(DERIV / "topic_ranking_usa_may.csv")
 
 
 ACRONYMS = ["API", "AI", "UI", "UX", "ML", "SQL", "HR", "IT", "SEO", "US", "PDF"]
@@ -278,7 +247,7 @@ def f0_context(axes, pal, fig):
 
 
 def f1_topics(axes, pal, fig):
-    d = pd.read_csv(MEMO / "topic_decomposition.csv").dropna(subset=["may"])
+    d = pd.read_csv(DERIV / "topic_decomposition.csv").dropna(subset=["may"])
     names = ["Broad categories\n(level 1)", "Specific topics\n(level 0)"]
     for ax, lvl, nm in zip(axes, (1, 0), names):
         s = d[d.lvl == lvl].sort_values("may", ascending=False)
@@ -294,7 +263,7 @@ def f1_topics(axes, pal, fig):
 
 
 def f2_countries(axes, pal, fig):
-    c = pd.read_csv(MEMO / "country_politics_shares.csv")
+    c = pd.read_csv(DERIV / "country_politics_shares.csv")
     sel = (pd.concat([c.nlargest(12, "pct"), c.nsmallest(12, "pct")])
            .drop_duplicates("geo_id").sort_values("pct"))
     ax = axes[0]
@@ -316,7 +285,7 @@ def f2_countries(axes, pal, fig):
 
 
 def f3_artifacts(axes, pal, fig):
-    a = pd.read_csv(MEMO / "artifacts.csv")
+    a = pd.read_csv(DERIV / "artifacts.csv")
     a = a[(a.politics >= 0.5) | (a.all_convos >= 3)].copy()
     a["label"] = a.artifact.str.replace("_", " ").str.capitalize()
     a = a.sort_values("politics")
@@ -339,7 +308,7 @@ def f3_artifacts(axes, pal, fig):
 
 
 def f4_info_action(axes, pal, fig):
-    p = pd.read_csv(MEMO / "info_action_profile.csv").sort_values("info")
+    p = pd.read_csv(DERIV / "info_action_profile.csv").sort_values("info")
     ax = axes[0]
     y = np.arange(len(p))
     kinds = [("info", "Information"), ("action", "Action"), ("doc", "Document")]
@@ -370,7 +339,7 @@ def f4_info_action(axes, pal, fig):
 def f5_composition(axes, pal, fig):
     # keep_default_na: the "None" collaboration pattern is a CATEGORY NAME;
     # the default reader turns it into NaN and the bar loses its label.
-    c = pd.read_csv(MEMO / "composition.csv", keep_default_na=False)
+    c = pd.read_csv(DERIV / "composition.csv", keep_default_na=False)
     c["may"] = c["may"].astype(float)
     # ASCII only, and never lower-case the definitions or "AI outputs" becomes
     # "ai outputs".
@@ -394,10 +363,10 @@ def f5_composition(axes, pal, fig):
 def f6_did(axes, pal, fig):
     # One axis, in percentage points, so every interval is comparable. The log
     # specification is deliberately absent: it is not in pp and cannot share
-    # this axis; it is reported in the memo instead.
-    sp = pd.read_csv(MEMO / "did_specs.csv")
+    # this axis; it is reported in the post's prose instead.
+    sp = pd.read_csv(DERIV / "did_specs.csv")
     sp = sp[sp.units == "pp"].rename(columns={"spec": "label"})
-    cm = pd.read_csv(MEMO / "specificity.csv")
+    cm = pd.read_csv(DERIV / "specificity.csv")
     cm = cm[cm.topic != "Politics and public record"].rename(columns={"topic": "label"})
     groups = [(sp, "Politics and\npublic record", pal["accent"]),
               (cm, "Other topics,\nsame design", pal["muted"])]
@@ -426,7 +395,7 @@ def f6_did(axes, pal, fig):
 
 
 def f7_null(axes, pal, fig):
-    nd = pd.read_csv(MEMO / "null_distribution.csv")
+    nd = pd.read_csv(DERIV / "null_distribution.csv")
     pol_t = float(nd.t[nd.topic == "Politics and public record"].iloc[0])
     rank = int((nd.t >= pol_t).sum())
     ax = axes[0]
@@ -472,7 +441,7 @@ def f7_null(axes, pal, fig):
 def _did_panel():
     """The estimation sample Dan's two blog figures use: the balanced Apr/May
     state panel with March-primary states dropped."""
-    d = pd.read_csv(ROOT / "modified_data" / "aei_did_data.csv")
+    d = pd.read_csv(DERIV / "aei_did_data.csv")
     return d[~d.march_primary]
 
 
@@ -606,32 +575,82 @@ def f7_spaghetti(axes, pal, fig):
             "plotted range.")
 
 
+def f10_turnout(axes, pal, fig):
+    """Change in the politics share against primary turnout, across the eight
+    May-primary states.
+
+    Reported with the full leave-one-out range, not a single flattering
+    deletion: r = 0.55 over all eight, but it runs from 0.24 (dropping Oregon,
+    the highest-turnout state) to 0.75 (dropping Idaho). On eight points that
+    spread IS the finding, and quoting only the deletion that strengthens the
+    correlation would misrepresent it.
+    """
+    t = pd.read_csv(ROOT / "original_data" / "primary_turnout" /
+                    "primary_turnout_2026.csv")
+    t["turnout"] = 100 * t.ballots / t.vap_2024
+    d = _did_panel()
+    w = (d[d.treat_may].pivot_table(index="state_po", columns="post",
+                                    values="politics_broad")
+         .rename(columns={False: "apr", True: "may"}).reset_index())
+    w["change"] = w.may - w.apr
+    m = w.merge(t, on="state_po")
+    assert len(m) == 8, f"expected the 8 May-primary states, got {len(m)}"
+
+    r_all = np.corrcoef(m.turnout, m.change)[0, 1]
+    loo = [np.corrcoef(m.turnout[m.state_po != s], m.change[m.state_po != s])[0, 1]
+           for s in m.state_po]
+
+    ax = axes[0]
+    ax.axhline(0, color=pal["rule"], lw=0.8, zorder=2)
+    b, a = np.polyfit(m.turnout, m.change, 1)
+    xs = np.linspace(m.turnout.min() - 1, m.turnout.max() + 1, 50)
+    ax.plot(xs, a + b * xs, ls=(0, (4, 2)), color=pal["flat"], lw=1.4, zorder=3)
+    ax.scatter(m.turnout, m.change, s=70, color=pal["accent"], zorder=4)
+    for r in m.itertuples():
+        ax.annotate(r.state_po, (r.turnout, r.change), textcoords="offset points",
+                    xytext=(9, 4), fontsize=pal["base"], fontweight="bold",
+                    color=pal["accent"])
+    style_axes(ax, pal)
+    ax.grid(axis="y", color=pal["grid"], linewidth=0.7, zorder=0)
+    ax.tick_params(axis="y", length=3)
+    ax.set_xlabel("Primary turnout (ballots cast, % of adult population)",
+                  fontsize=pal["base"] + 1, color=pal["axis"], labelpad=8)
+    ax.set_ylabel("Change in politics-topic share, April to May (pp)",
+                  fontsize=pal["base"] + 1, color=pal["axis"], labelpad=8)
+    return ("Change in Politics-Topic Share vs. Primary Turnout",
+            f"The {len(m)} May-primary states. r = {r_all:.2f}; dropping any one "
+            f"state moves it between {min(loo):.2f} and {max(loo):.2f}.\n"
+            f"Turnout is measured on different bases by state -- see the readme.")
+
+
 # --- registry ---------------------------------------------------------------
 # rows: relative panel heights (number of bars). left: inches reserved for the
 # y tick labels, plus the strip column where there is one.
 FIGS = [
     dict(key="politics_in_context", fn=f0_context, out="post_01_F0_politics_in_context",
-         w=9.6, h=7.6, rows=[1], left=2.2, bottom=0.66, memo=False),
+         w=9.6, h=7.6, rows=[1], left=2.2, bottom=0.66),
     dict(key="topic_decomposition", fn=f1_topics, out="post_02_F1_topic_breakdown",
-         w=9.4, h=5.4, rows=[3, 6], left=3.5, bottom=0.66, memo=True),
+         w=9.4, h=5.4, rows=[3, 6], left=3.5, bottom=0.66),
     dict(key="country_shares", fn=f2_countries, out="post_03_F2_country_shares",
-         w=7.2, h=6.6, rows=[1], left=0.9, bottom=1.1, memo=True),
+         w=7.2, h=6.6, rows=[1], left=0.9, bottom=1.1),
     dict(key="artifacts", fn=f3_artifacts, out="post_04_F3_artifacts",
-         w=8.4, h=5.6, rows=[1], left=2.4, bottom=1.1, memo=True),
+         w=8.4, h=5.6, rows=[1], left=2.4, bottom=1.1),
     dict(key="info_action", fn=f4_info_action, out="post_05_F4_info_vs_action",
-         w=9.6, h=5.2, rows=[1], left=2.2, bottom=1.1, memo=False),
+         w=9.6, h=5.2, rows=[1], left=2.2, bottom=1.1),
     dict(key="composition", fn=f5_composition, out="post_06_F5_how_conducted",
-         w=10.6, h=5.8, rows=[3, 2, 6], left=4.6, bottom=0.66, memo=False),
+         w=10.6, h=5.8, rows=[3, 2, 6], left=4.6, bottom=0.66),
     dict(key="politics_arrows", fn=f6_arrows, out="post_07_F6_politics_arrows",
-         w=8.2, h=9.4, rows=[30, 2], left=2.6, bottom=0.66, memo=False,
+         w=8.2, h=9.4, rows=[30, 2], left=2.6, bottom=0.66,
          gap=1.15),   # room for panel 1's axis title above panel 2
     dict(key="did_spaghetti", fn=f7_spaghetti, out="post_08_F7_did_spaghetti",
-         w=7.6, h=8.0, rows=[1, 1, 1], left=1.5, bottom=0.66, memo=False,
+         w=7.6, h=8.0, rows=[1, 1, 1], left=1.5, bottom=0.66,
          head=1.72, gap=0.62),   # room for the per-panel titles
     dict(key="did_estimates", fn=f6_did, out="post_09_F8_did_estimates",
-         w=9.8, h=4.6, rows=[2, 4], left=3.4, bottom=0.66, memo=False),
+         w=9.8, h=4.6, rows=[2, 4], left=3.4, bottom=0.66),
     dict(key="null_distribution", fn=f7_null, out="post_10_F9_null_distribution",
-         w=8.4, h=5.0, rows=[1], left=1.0, bottom=0.66, memo=True),
+         w=8.4, h=5.0, rows=[1], left=1.0, bottom=0.66),
+    dict(key="turnout_scatter", fn=f10_turnout, out="post_11_F10_turnout_scatter",
+         w=8.2, h=5.2, rows=[1], left=1.2, bottom=0.66),
 ]
 
 
@@ -679,12 +698,8 @@ def main():
 
     for spec in FIGS:
         render(spec, FS, True, POST / f"{spec['out']}.png")
-        if spec["memo"]:
-            render(spec, MEMO_PAL, False, MEMO / f"fig_{spec['key']}.pdf")
 
-    n_memo = sum(s["memo"] for s in FIGS)
-    print(f"[fig] {len(FIGS)} branded PNGs -> {POST}")
-    print(f"[fig] {n_memo} plain PDFs -> {MEMO}")
+    print(f"[fig] {len(FIGS)} figures -> {POST}")
     for s in FIGS:
         kb = (POST / f"{s['out']}.png").stat().st_size // 1024
         print(f"      {s['out']}.png  {kb} KB")
