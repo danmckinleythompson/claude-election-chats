@@ -216,6 +216,8 @@ def main() -> int:
     pd.DataFrame(rows).to_csv(DERIV / "composition.csv", index=False)
 
     # --- artifacts: politics vs all conversations ---------------------------
+    req_g = aei[(aei.geo_level == "global") & (aei.date_start == MAY) &
+                (aei.category_name == "request") & (aei.metric_id == "pct")]
     art_src = aei[(aei.geo_level == "global") & (aei.date_start == MAY) &
                   aei.metric_id.str.startswith("artifact_", na=False)]
     art_src = art_src[((art_src.category_name == "request") &
@@ -227,7 +229,16 @@ def main() -> int:
                            .str.replace("_pct", "", regex=False))
     art = art_src.pivot_table(index="artifact", columns="who",
                               values="value").reset_index()
-    art["diff"] = art.politics - art.all_convos
+    # AEI publishes the politics topic and ALL conversations, and "all"
+    # includes the political ones. Back them out so the comparison series is
+    # genuinely everything else: all = w*politics + (1-w)*rest, where w is the
+    # politics topic's share of global conversations. w is 0.30%, so this
+    # barely moves any number -- but it makes "non-political" a true label
+    # rather than a loose one.
+    w = float(req_g[(req_g.node_name == OUTCOME)].value.iloc[0]) / 100
+    art["non_politics"] = (art.all_convos - w * art.politics) / (1 - w)
+    art["diff"] = art.politics - art.non_politics
+    art.attrs["politics_share_global"] = w
     art.sort_values("politics", ascending=False).to_csv(
         DERIV / "artifacts.csv", index=False)
 

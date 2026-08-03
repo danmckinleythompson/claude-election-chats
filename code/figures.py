@@ -151,8 +151,13 @@ def finish(fig, W, H, pal, title, subtitle, branded):
                              color=pal["accent"], transform=fig.transFigure,
                              clip_on=False))
     fig.text(x0, 1 - 0.56 / H, title, ha="left", va="top", fontsize=17,
-             fontweight="bold", color="#1A1A18", family=pal["family"])
-    fig.text(x0, 1 - 0.86 / H, subtitle, ha="left", va="top", fontsize=10.5,
+             fontweight="bold", color="#1A1A18", family=pal["family"],
+             linespacing=1.25)
+    # The subtitle sits below however many lines the title takes, so a
+    # two-line title pushes it down instead of printing on top of it. A figure
+    # with a multi-line title also needs a taller head= in the registry.
+    sub_y = 0.56 + 0.30 * (title.count("\n") + 1)
+    fig.text(x0, 1 - sub_y / H, subtitle, ha="left", va="top", fontsize=10.5,
              color="#6B6B63", family=pal["family"], linespacing=1.35)
 
     fig.add_artist(plt.Line2D([x0, 1 - x0], [(FOOT - 0.10) / H] * 2,
@@ -284,27 +289,68 @@ def f2_countries(axes, pal, fig):
             "Twelve highest and twelve lowest countries, May 2026.")
 
 
-def f3_artifacts(axes, pal, fig):
+def _artifacts(axes, pal, fig, top_n=None, callout=False):
+    """Politics vs all conversations, by the artifact the conversation produced.
+
+    "none" is dropped: it is the absence of an artifact rather than a kind of
+    one. The remaining selection rule is stated in the subtitle -- there are 32
+    artifact types and showing all of them is unreadable, so leaving the rule
+    implicit would be cherry-picking.
+    """
     a = pd.read_csv(DERIV / "artifacts.csv")
-    a = a[(a.politics >= 0.5) | (a.all_convos >= 3)].copy()
+    n_types = len(a)
+    a = a[a.artifact != "none"].copy()
+    if top_n:                                  # the biggest gaps either way
+        a = a.reindex(a["diff"].abs().sort_values(ascending=False).index).head(top_n)
+    else:
+        a = a[(a.politics >= 0.5) | (a.non_politics >= 3)]
     a["label"] = a.artifact.str.replace("_", " ").str.capitalize()
     a = a.sort_values("politics")
+
     ax = axes[0]
     y = np.arange(len(a))
-    ax.hlines(y, a.all_convos, a.politics, color=pal["flat"], lw=2.2, zorder=2)
-    ax.scatter(a.all_convos, y, s=62, color=pal["muted"], zorder=3,
-               label="All conversations")
+    ax.hlines(y, a.non_politics, a.politics, color=pal["flat"], lw=2.2, zorder=2)
+    ax.scatter(a.non_politics, y, s=62, color=pal["muted"], zorder=3,
+               label="Non-political conversations")
     ax.scatter(a.politics, y, s=62, color=pal["accent"], zorder=3,
                label="Politics topic")
     ax.set_yticks(y)
     ax.set_yticklabels(a.label)
-    ax.set_ylim(-0.7, len(a) - 0.3)
+    ax.set_ylim(-0.7, len(a) - 0.3 + (0.75 if callout else 0))
     style_axes(ax, pal)
     ax.set_xlabel("Share of conversations producing this artifact (%)",
                   fontsize=pal["base"] + 1, color=pal["axis"], labelpad=8)
     bottom_legend(fig, *ax.get_legend_handles_labels(), pal, 2)
-    return ("Artifacts Produced: Politics Topic vs. All Conversations",
-            "Worldwide, May 2026. Artifact = the conversation's main concrete output.")
+
+    if callout:
+        # At thumbnail size the dumbbells read as "blue is right of grey"
+        # without conveying by how much. Name the multiple on the top row.
+        top = a.iloc[-1]
+        ax.annotate(f"{top.politics / top.non_politics:.1f}x the rate for\n"
+                    f"non-political conversations",
+                    xy=(top.politics, len(a) - 1), xytext=(-6, 26),
+                    textcoords="offset points", ha="right", va="bottom",
+                    fontsize=pal["base"], fontweight="bold", color=pal["accent"],
+                    linespacing=1.3)
+
+    sel = (f"The {top_n} artifact types with the largest gap, of {n_types}."
+           if top_n else f"Artifact types with a share above 0.5%, of {n_types}.")
+    # Assertive, unlike the in-post figures: built to be shared on its own,
+    # where there is no surrounding prose to carry the finding. "Claude.ai" not
+    # "Claude" -- the AEI file is consumer conversations only, so anything
+    # generated through the API is invisible here.
+    return ("Political conversations with Claude focus more on\n"
+            "explanation and less on advice or action",
+            f"Share of conversations producing each artifact. Claude.ai, "
+            f"worldwide, May 2026.\n{sel} Conversations producing none are excluded.")
+
+
+def f3_artifacts(axes, pal, fig):
+    return _artifacts(axes, pal, fig)
+
+
+def f3_artifacts_share(axes, pal, fig):
+    return _artifacts(axes, pal, fig, top_n=6, callout=True)
 
 
 def f4_info_action(axes, pal, fig):
@@ -634,7 +680,7 @@ FIGS = [
     dict(key="country_shares", fn=f2_countries, out="post_03_F2_country_shares",
          w=7.2, h=6.6, rows=[1], left=0.9, bottom=1.1),
     dict(key="artifacts", fn=f3_artifacts, out="post_04_F3_artifacts",
-         w=8.4, h=5.6, rows=[1], left=2.4, bottom=1.1),
+         w=9.0, h=5.6, rows=[1], left=2.4, bottom=1.1, head=1.60),
     dict(key="info_action", fn=f4_info_action, out="post_05_F4_info_vs_action",
          w=9.6, h=5.2, rows=[1], left=2.2, bottom=1.1),
     dict(key="composition", fn=f5_composition, out="post_06_F5_how_conducted",
@@ -651,6 +697,15 @@ FIGS = [
          w=8.4, h=5.0, rows=[1], left=1.0, bottom=0.66),
     dict(key="turnout_scatter", fn=f10_turnout, out="post_11_F10_turnout_scatter",
          w=8.2, h=5.2, rows=[1], left=1.2, bottom=0.66),
+]
+
+
+# Rendered alongside the post but deliberately outside its numbering: a 16:9
+# card sized for an X timeline, where the post's near-square figures get
+# letterboxed or cropped in preview.
+SHARE = [
+    dict(key="artifacts_share", fn=f3_artifacts_share, out="share_x_artifacts",
+         w=11.0, h=3.3, rows=[1], left=2.4, bottom=1.1, head=1.60),
 ]
 
 
@@ -696,11 +751,11 @@ def main():
             shutil.rmtree(p) if p.is_dir() else p.unlink()
             print(f"[fig] retired {name}")
 
-    for spec in FIGS:
+    for spec in FIGS + SHARE:
         render(spec, FS, True, POST / f"{spec['out']}.png")
 
-    print(f"[fig] {len(FIGS)} figures -> {POST}")
-    for s in FIGS:
+    print(f"[fig] {len(FIGS)} figures + {len(SHARE)} share card -> {POST}")
+    for s in FIGS + SHARE:
         kb = (POST / f"{s['out']}.png").stat().st_size // 1024
         print(f"      {s['out']}.png  {kb} KB")
 
