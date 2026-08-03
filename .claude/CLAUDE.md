@@ -1,13 +1,50 @@
 # AIElectionResearch
 
-Replication repo for the Free Systems post "Quantifying the Information
-Layer" (with Andy Hall): descriptives on political Claude usage plus the
-primary-timing diff-in-diff, all from the AEI June 2026 release.
+Do Claude conversations shift toward politics when a state holds its primary?
+Diff-in-differences on the Anthropic Economic Index state-month topic shares
+(April vs May 2026), using the staggered 2026 primary calendar, benchmarked
+against the same design in Google search data.
 
 **Language:** R (tidyverse, fixest). Entry point: `code/master.R` —
-clean -> prep -> estimate -> one make_ script per blog figure (11 figures,
-styling in `_blog_style.R` matched to the post's tan/teal charts).
-The post's Google Doc is the source of truth for which figures exist.
+clean -> prep -> tables (which also run the estimation) -> figures, for both
+the Claude and search sides. Deliverable: `draft/aei_memo/aei_memo.pdf`.
+`code/memo/master_memo.R` is Andy Hall's separate descriptive memo pipeline
+(merged from PR #1); don't fold it into master.R.
+
+**The post is Python, end to end.** `python3 code/master.py` runs two stages:
+`code/analysis.py` (cleaning, panel construction, estimation -> derived CSVs in
+`modified_data/`) then `code/figures.py` (those CSVs -> `output/post/`).
+Nothing in analysis draws; nothing in figures estimates. analysis.py checks its
+estimates against the R pipeline it replaced (`EXPECTED`) and exits non-zero if
+they drift -- pyfixest reproduces fixest to <1e-4 on all 13.
+
+**The last R is the search benchmark.** `code/master.R` now runs only the
+Google Trends robustness chain, which is pending a port to Python.
+`make_aei_did_table.R` / `make_aei_politics_did.R` / `make_aei_change_hist.R`
+recompute what analysis.py already produces; port or retire them together.
+`code/memo/05_cross_release_series.R` and `05_subtopic_did.R` are unrelated and
+still live.
+
+**The post** (`output/post/post_01..11_*.png`, dragged in filename order) is
+**figures only** -- every finding is carried by a figure -- in the Free Systems
+house style: off-white `#FAFAF7`, teal
+`#2B5B6C`, copper `#C4703E`, header rule + title + subtitle, footer with the
+logo and `freesystems.substack.com`. Brand spec: `~/freesystems/CLAUDE.md`.
+Figure titles **describe what is plotted and never state the conclusion**;
+subtitles carry only neutral orienting facts (geography, month, what does not
+sum). The argument goes in the post's prose, not on the chart.
+
+**Two Free Systems styles exist; the teal one wins.** `code/_freesystems_style.R`
+(DT) is blue `#2E74C0` on white with centred titles, colours read off earlier
+posted charts. The post uses the website design system instead (teal/copper +
+logo). `make_politics_arrows.R` and `make_did_spaghetti.R` are ported into
+`figures.py` as F6 and F7 for the post; the R originals still run under
+`code/master.R` and still write their blue twins to `output/`, which are NOT
+post assets. Restyle or retire them before they get mixed in.
+
+**Never clean `output/post/` by exclusion.** Other scripts write figures there.
+Delete stale assets from an explicit list (see `figures.py`); a
+delete-what-I-don't-recognise rule destroyed `fig_cross_release_series.png`.
 
 ## Key results
 
@@ -37,14 +74,10 @@ The post's Google Doc is the source of truth for which figures exist.
   only; TN holds county primaries in early May despite its Aug 6 statewide
   date; WI had an Apr 7 spring election.
 
-## Archived (kept locally, untracked in git since the blog-post refocus)
+## Archived (kept, not deleted)
 
-- `code/xarchive/`: everything superseded — the Google Trends pipeline
-  (SVG-decode collection, search DiD/event study), the memo-era AEI scripts,
-  the Free Systems blue/gray styling, and Andy's original memo pipeline
-  (`xarchive/memo/`).
-- `draft/`: the aei_memo, Andy's politics_memo, and the frozen full paper —
-  all superseded by the blog post, all still in Dropbox.
-- `output/_archive/` and `modified_data/_archive/`: superseded exhibits and
-  derived data. Raw Google Trends pulls: `original_data/google_trends/`
-  (untracked) and `original_data/_archive/google_trends/`.
+- `code/xarchive/`: the full earlier pipeline — Google Trends collection
+  (SVG-decode approach, see notes/google_trends_pull_notes.txt), the search
+  event study, national series figures, and the four-release AEI extraction.
+- Raw Google Trends pulls remain in `original_data/_archive/google_trends/`
+  (immutable); derived Trends data are in `modified_data/_archive/`.
